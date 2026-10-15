@@ -22,45 +22,67 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px;
+            padding: 10px;
             overflow-x: hidden;
         }
-        header { text-align: center; margin-bottom: 15px; }
+        header { text-align: center; margin-bottom: 10px; }
         h1 {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             color: var(--neon-cyan);
             text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 243, 255, 0.5);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .subtitle { font-size: 0.85rem; color: #a5b4fc; margin-top: 3px; }
+        .subtitle { font-size: 0.8rem; color: #a5b4fc; margin-top: 2px; }
         
-        .main-container {
+        /* Contenedor principal en paralelo (Lado a Lado) */
+        .main-layout {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .column-wheel {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%;
-            max-width: 450px;
-            gap: 15px;
+            flex: 1;
+            min-width: 300px;
+            max-width: 380px;
+            gap: 12px;
+        }
+
+        .column-side {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            min-width: 300px;
+            max-width: 380px;
         }
         
         /* Ruleta */
         .wheel-container {
             position: relative;
-            width: 320px;
-            height: 320px;
-            margin: 10px auto;
+            width: 280px;
+            height: 280px;
+            margin: 5px auto;
         }
         .pointer {
             position: absolute;
-            top: -15px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid var(--neon-pink);
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 25px solid var(--neon-pink);
             z-index: 20;
             filter: drop-shadow(0 0 8px var(--neon-pink));
         }
@@ -68,71 +90,72 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            box-shadow: 0 0 25px var(--neon-pink), inset 0 0 15px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px var(--neon-pink), inset 0 0 12px rgba(255, 255, 255, 0.3);
             border: 4px solid var(--neon-cyan);
         }
         
         /* Botón Gigante de Giro */
         .spin-btn {
             width: 100%;
-            padding: 18px;
-            font-size: 1.4rem;
+            padding: 15px;
+            font-size: 1.2rem;
             font-weight: bold;
             background: linear-gradient(135deg, var(--neon-pink), #ff5e00);
             color: white;
             border: none;
-            border-radius: 16px;
+            border-radius: 14px;
             cursor: pointer;
             text-transform: uppercase;
-            box-shadow: 0 0 20px var(--neon-pink);
+            box-shadow: 0 0 15px var(--neon-pink);
             transition: transform 0.1s, box-shadow 0.1s;
             letter-spacing: 1px;
         }
-        .spin-btn:active { transform: scale(0.96); box-shadow: 0 0 10px var(--neon-pink); }
+        .spin-btn:active { transform: scale(0.96); box-shadow: 0 0 8px var(--neon-pink); }
 
         /* Paneles */
         .panel {
             background-color: var(--panel-bg);
             border: 2px solid var(--neon-cyan);
-            border-radius: 16px;
-            padding: 15px;
+            border-radius: 14px;
+            padding: 12px;
             width: 100%;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.15);
         }
-        .panel.yellow-border { border-color: var(--neon-yellow); box-shadow: 0 0 15px rgba(255, 254, 0, 0.2); }
-        .panel h2 { font-size: 1.1rem; color: var(--neon-yellow); margin-bottom: 10px; text-align: center; }
+        .panel.yellow-border { border-color: var(--neon-yellow); box-shadow: 0 0 12px rgba(255, 254, 0, 0.15); }
+        .panel h2 { font-size: 1rem; color: var(--neon-yellow); margin-bottom: 8px; text-align: center; }
         
         .input-group {
             display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
         input[type="text"] {
             flex: 1;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 10px;
+            border-radius: 8px;
             border: 1px solid #4b5563;
             background-color: #1f1a3a;
             color: white;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
         .add-btn {
-            padding: 0 16px;
+            padding: 0 14px;
             background-color: var(--neon-lime);
             color: #000;
             font-weight: bold;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 0.9rem;
         }
         
         /* Listas */
         .items-list, .players-list {
-            max-height: 140px;
+            max-height: 120px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
             padding-right: 4px;
         }
         .item-row, .player-row {
@@ -140,38 +163,39 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(255,255,255,0.05);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
         }
 
         .player-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         .player-name { font-weight: bold; color: #fff; }
         .player-score { 
             background: var(--neon-pink); 
             color: white; 
-            padding: 2px 8px; 
-            border-radius: 12px; 
+            padding: 2px 6px; 
+            border-radius: 10px; 
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .player-controls {
             display: flex;
-            gap: 5px;
+            gap: 4px;
         }
         .score-btn {
             background: #374151;
             color: white;
             border: 1px solid #6b7280;
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 3px 6px;
+            border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 0.8rem;
         }
         .score-btn.plus { background: #166534; border-color: var(--neon-lime); color: var(--neon-lime); }
         .score-btn.minus { background: #991b1b; border-color: #ef4444; color: #fca5a5; }
@@ -180,11 +204,26 @@
             background: #ef4444;
             color: white;
             border: none;
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 3px 6px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
+
+        /* Banner de Turno Actual */
+        .turn-banner {
+            background: linear-gradient(135deg, #7c3aed, #db2777);
+            border: 2px solid var(--neon-yellow);
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 254, 0, 0.4);
+            margin-bottom: 5px;
+        }
+        .turn-banner span { color: var(--neon-yellow); text-transform: uppercase; }
 
         /* Modales */
         .modal {
@@ -207,49 +246,49 @@
             border-radius: 20px;
             text-align: center;
             width: 90%;
-            max-width: 400px;
+            max-width: 380px;
             box-shadow: 0 0 30px var(--neon-lime);
             animation: popIn 0.3s ease;
         }
-        .modal-content h3 { color: var(--neon-yellow); font-size: 1.3rem; margin-bottom: 5px; text-transform: uppercase; }
-        .modal-content p { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #fff; }
+        .modal-content h3 { color: var(--neon-yellow); font-size: 1.2rem; margin-bottom: 4px; text-transform: uppercase; }
+        .modal-content p { font-size: 1.1rem; font-weight: bold; margin-bottom: 8px; color: #fff; }
         
         .custom-box {
             background: rgba(0,0,0,0.5);
             border: 2px dashed var(--neon-cyan);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
             text-align: center;
         }
         .box-category {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--neon-pink);
             text-transform: uppercase;
             font-weight: bold;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .box-question { 
             color: var(--neon-cyan); 
-            font-size: 1.1rem; 
-            margin-bottom: 10px; 
-            line-height: 1.4; 
+            font-size: 1rem; 
+            margin-bottom: 8px; 
+            line-height: 1.3; 
             font-weight: bold;
         }
 
         .options-grid {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
         .option-btn {
             background: #2a224a;
             color: white;
             border: 1px solid var(--neon-cyan);
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
             text-align: left;
             cursor: pointer;
             transition: background 0.2s;
@@ -259,32 +298,32 @@
 
         .trivial-answer { 
             color: var(--neon-lime); 
-            font-size: 0.95rem; 
+            font-size: 0.9rem; 
             font-weight: bold; 
             display: none; 
-            margin-top: 8px; 
+            margin-top: 6px; 
         }
         
         .btn-reveal {
             background: var(--neon-yellow);
             color: #000;
             border: none;
-            padding: 8px 16px;
+            padding: 6px 12px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             width: 100%;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .close-modal {
             background: var(--neon-pink);
             color: white;
             border: none;
-            padding: 10px 25px;
-            font-size: 1rem;
+            padding: 10px 20px;
+            font-size: 0.95rem;
             font-weight: bold;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             box-shadow: 0 0 10px var(--neon-pink);
             width: 100%;
@@ -302,32 +341,42 @@
         <div class="subtitle">ChicaOhyeah TikTok Live</div>
     </header>
 
-    <div class="main-container">
-        <div class="wheel-container">
-            <div class="pointer"></div>
-            <canvas id="wheel" width="400" height="400"></canvas>
+    <div class="main-layout">
+        <!-- Columna Izquierda: Ruleta y Botón -->
+        <div class="column-wheel">
+            <div class="wheel-container">
+                <div class="pointer"></div>
+                <canvas id="wheel" width="350" height="350"></canvas>
+            </div>
+            <button class="spin-btn" id="spinButton">¡Girar Ruleta!</button>
         </div>
 
-        <button class="spin-btn" id="spinButton">¡Girar Ruleta!</button>
-
-        <!-- Panel Marcador de Jugadores -->
-        <div class="panel yellow-border">
-            <h2>🏆 Tablero de Puntos</h2>
-            <div class="input-group">
-                <input type="text" id="newPlayerName" placeholder="Nombre del jugador/usuario...">
-                <button class="add-btn" id="addPlayerBtn">Añadir</button>
+        <!-- Columna Derecha: Tablero de Puntos y Gestor de Casillas -->
+        <div class="column-side">
+            <!-- Banner de Turno -->
+            <div class="turn-banner" id="turnBanner">
+                🎮 Turno de: <span id="currentTurnPlayer">Nadie (Añade jugadores)</span>
             </div>
-            <div class="players-list" id="playersList"></div>
-        </div>
 
-        <!-- Panel Configuración de Casillas -->
-        <div class="panel">
-            <h2>Personalizar Casillas</h2>
-            <div class="input-group">
-                <input type="text" id="newItemText" placeholder="Añade nuevo reto u opción...">
-                <button class="add-btn" id="addBtn">Añadir</button>
+            <!-- Panel Marcador de Jugadores -->
+            <div class="panel yellow-border">
+                <h2>🏆 Tablero de Puntos</h2>
+                <div class="input-group">
+                    <input type="text" id="newPlayerName" placeholder="Nombre de participante...">
+                    <button class="add-btn" id="addPlayerBtn">Añadir</button>
+                </div>
+                <div class="players-list" id="playersList"></div>
             </div>
-            <div class="items-list" id="itemsList"></div>
+
+            <!-- Panel Configuración de Casillas -->
+            <div class="panel">
+                <h2>Personalizar Casillas</h2>
+                <div class="input-group">
+                    <input type="text" id="newItemText" placeholder="Añade opción o reto...">
+                    <button class="add-btn" id="addBtn">Añadir</button>
+                </div>
+                <div class="items-list" id="itemsList"></div>
+            </div>
         </div>
     </div>
 
@@ -357,7 +406,7 @@
         ];
 
         const defaultPlayers = [
-            { name: "Jugador 1", score: 0 }
+            { name: "ChicaOhyeah", score: 0 }
         ];
 
         const preguntasTrivial = [
@@ -411,6 +460,7 @@
         const playersList = document.getElementById('playersList');
         const newPlayerName = document.getElementById('newPlayerName');
         const addPlayerBtn = document.getElementById('addPlayerBtn');
+        const currentTurnPlayer = document.getElementById('currentTurnPlayer');
 
         const resultModal = document.getElementById('resultModal');
         const resultText = document.getElementById('resultText');
@@ -437,19 +487,19 @@
         function drawWheel() {
             if (!canvas.getContext) return;
             arc = Math.PI / (items.length / 2);
-            ctx.clearRect(0, 0, 400, 400);
+            ctx.clearRect(0, 0, 350, 350);
 
-            let outsideRadius = 185;
-            let textRadius = 130;
-            let insideRadius = 30;
+            let outsideRadius = 160;
+            let textRadius = 110;
+            let insideRadius = 25;
 
             for(let i = 0; i < items.length; i++) {
                 let angle = startAngle + i * arc;
                 ctx.fillStyle = colors[i % colors.length];
 
                 ctx.beginPath();
-                ctx.arc(200, 200, outsideRadius, angle, angle + arc, false);
-                ctx.arc(200, 200, insideRadius, angle + arc, angle, true);
+                ctx.arc(175, 175, outsideRadius, angle, angle + arc, false);
+                ctx.arc(175, 175, insideRadius, angle + arc, angle, true);
                 ctx.stroke();
                 ctx.fill();
 
@@ -459,19 +509,19 @@
                 ctx.shadowBlur = 2;
                 ctx.shadowColor = "rgb(0,0,0)";
                 ctx.fillStyle = "#000000";
-                ctx.translate(200 + Math.cos(angle + arc / 2) * textRadius, 
-                              200 + Math.sin(angle + arc / 2) * textRadius);
+                ctx.translate(175 + Math.cos(angle + arc / 2) * textRadius, 
+                              175 + Math.sin(angle + arc / 2) * textRadius);
                 ctx.rotate(angle + arc / 2 + Math.PI / 2);
                 let text = items[i];
-                let maxLength = 16;
+                let maxLength = 14;
                 if(text.length > maxLength) text = text.substring(0, maxLength) + '...';
-                ctx.font = 'bold 13px sans-serif';
+                ctx.font = 'bold 12px sans-serif';
                 ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
                 ctx.restore();
             }
 
             ctx.beginPath();
-            ctx.arc(200, 200, insideRadius, 0, 2 * Math.PI, false);
+            ctx.arc(175, 175, insideRadius, 0, 2 * Math.PI, false);
             ctx.fillStyle = '#151124';
             ctx.fill();
             ctx.lineWidth = 4;
@@ -499,6 +549,14 @@
             let winningText = items[index];
             let textUpper = winningText.toUpperCase();
 
+            // Seleccionar aleatoriamente a un jugador del marcador para el turno
+            if (players.length > 0) {
+                let randomPlayer = players[Math.floor(Math.random() * players.length)];
+                currentTurnPlayer.textContent = randomPlayer.name;
+            } else {
+                currentTurnPlayer.textContent = "Nadie (Añade jugadores)";
+            }
+
             customBox.style.display = "none";
             optionsGrid.innerHTML = '';
             revealBtn.style.display = "none";
@@ -506,7 +564,7 @@
 
             if (textUpper.includes("TRIVIAL") || winningText.includes("🧠")) {
                 modalTitle.textContent = "🧠 ¡PREGUNTA TRIVIAL!";
-                resultText.textContent = "¡Si aciertas, ganas 1 punto!";
+                resultText.textContent = `Turno de: ${currentTurnPlayer.textContent}`;
                 let randomQ = preguntasTrivial[Math.floor(Math.random() * preguntasTrivial.length)];
                 boxCategory.textContent = randomQ.cat;
                 boxQuestion.textContent = randomQ.q;
@@ -533,50 +591,50 @@
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("GANAS") || textUpper.includes("SUMA")) {
-                modalTitle.textContent = "🎉 ¡PUNTO DE REGALO!";
-                resultText.textContent = "¡Sumale 1 punto manualmente al marcador!";
+                modalTitle.textContent = "🎉 ¡PUNTO EXTRA!";
+                resultText.textContent = `¡${currentTurnPlayer.textContent} gana 1 punto!`;
                 boxCategory.textContent = "⭐ RECOMPENSA";
-                boxQuestion.textContent = "¡Añade +1 punto al jugador activo!";
+                boxQuestion.textContent = "¡Súmale +1 punto en el tablero lateral!";
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("PIERDES") || textUpper.includes("RESTA")) {
-                modalTitle.textContent = "💥 ¡MALAS NOTICIAS!";
-                resultText.textContent = "¡Réstale 1 punto en el marcador!";
-                boxCategory.textContent = "⚠️ PENALIZACIÓN";
-                boxQuestion.textContent = "¡Quítale -1 punto al jugador activo!";
+                modalTitle.textContent = "💥 ¡PENALIZACIÓN!";
+                resultText.textContent = `¡${currentTurnPlayer.textContent} pierde 1 punto!`;
+                boxCategory.textContent = "⚠️ RESTA DE PUNTOS";
+                boxQuestion.textContent = "¡Réstale -1 punto en el tablero lateral!";
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("INCÓMODA") || textUpper.includes("INCOMODA") || winningText.includes("🤫")) {
                 modalTitle.textContent = "🤫 ¡ZONA DE SALSEO!";
-                resultText.textContent = "¡Responde o pierde punto!";
+                resultText.textContent = `Le toca confesar a: ${currentTurnPlayer.textContent}`;
                 boxCategory.textContent = "🔥 PREGUNTA INCÓMODA";
                 boxQuestion.textContent = preguntasIncomodas[Math.floor(Math.random() * preguntasIncomodas.length)];
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("JOKER") || winningText.includes("🃏")) {
-                modalTitle.textContent = "🃏 ¡HA SALIDO EL JOKER!";
-                resultText.textContent = "¡Poder oculto activado!";
-                boxCategory.textContent = "⚡ PODER COMODÍN";
+                modalTitle.textContent = "🃏 ¡PODER DEL JOKER!";
+                resultText.textContent = `Poder especial para: ${currentTurnPlayer.textContent}`;
+                boxCategory.textContent = "⚡ COMODÍN";
                 boxQuestion.textContent = poderesJoker[Math.floor(Math.random() * poderesJoker.length)];
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("PÉNDULO") || textUpper.includes("PENDULO") || winningText.includes("🔮")) {
                 modalTitle.textContent = "🔮 ¡PREGÚNTALE AL PÉNDULO!";
-                resultText.textContent = "¡Haz tu pregunta en el chat!";
+                resultText.textContent = `Pregunta de: ${currentTurnPlayer.textContent}`;
                 boxCategory.textContent = "✨ PREDICCIÓN MÍSTICA";
                 boxQuestion.textContent = respuestasPendulo[Math.floor(Math.random() * respuestasPendulo.length)];
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("REGALOS") || winningText.includes("🎁")) {
                 modalTitle.textContent = "🎁 ¡EVENTO DE REGALOS VIP!";
-                resultText.textContent = "¡Momento especial para el chat!";
+                resultText.textContent = `¡Reto para ${currentTurnPlayer.textContent} y el chat!`;
                 boxCategory.textContent = "👑 DINÁMICA DE REGALOS";
                 boxQuestion.textContent = dinámicasRegalos[Math.floor(Math.random() * dinámicasRegalos.length)];
                 customBox.style.display = "block";
 
             } else {
                 modalTitle.textContent = "¡Resultado del Caos!";
-                resultText.textContent = winningText;
+                resultText.textContent = `${currentTurnPlayer.textContent}: ${winningText}`;
             }
 
             resultModal.classList.add('show');
@@ -634,11 +692,14 @@
             }
         });
 
-        // --- Gestión de Jugadores y Marcador ---
+        // --- Gestión de Jugadores ---
         function updatePlayersList() {
             playersList.innerHTML = '';
             if (players.length === 0) {
-                playersList.innerHTML = '<div style="text-align:center; color:#9ca3af; font-size:0.85rem;">No hay jugadores. ¡Añade el primero!</div>';
+                playersList.innerHTML = '<div style="text-align:center; color:#9ca3af; font-size:0.8rem;">No hay jugadores. ¡Añade el primero!</div>';
+                currentTurnPlayer.textContent = "Nadie (Añade jugadores)";
+            } else {
+                currentTurnPlayer.textContent = players[0].name;
             }
             players.forEach((player, index) => {
                 let row = document.createElement('div');

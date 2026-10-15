@@ -1,537 +1,456 @@
-```html
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>La Ruleta del Caos de ChicaOhyeah</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        neonFuchsia: '#ff007f',
-                        neonLime: '#39ff14',
-                        neonCyan: '#00f3ff',
-                        neonYellow: '#ffe600',
-                        neonPurple: '#b026ff',
-                        darkBg: '#090813',
-                        cardBg: '#121026'
-                    },
-                    fontFamily: {
-                        outfit: ['Outfit', 'sans-serif'],
-                        marker: ['"Permanent Marker"', 'cursive']
-                    },
-                    boxShadow: {
-                        'neon-fuchsia': '0 0 15px #ff007f, 0 0 30px #ff007f',
-                        'neon-lime': '0 0 15px #39ff14, 0 0 30px #39ff14',
-                        'neon-cyan': '0 0 15px #00f3ff, 0 0 30px #00f3ff',
-                        'neon-yellow': '0 0 15px #ffe600, 0 0 30px #ffe600',
-                        'neon-purple': '0 0 15px #b026ff, 0 0 30px #b026ff',
-                    }
-                }
-            }
-        }
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Ruleta del Caos - ChicaOhyeah</title>
     <style>
-        /* Deshabilitar selección no deseada en pantallas táctiles */
+        :root {
+            --bg-color: #0b0914;
+            --panel-bg: #151124;
+            --neon-pink: #ff007f;
+            --neon-cyan: #00f3ff;
+            --neon-lime: #39ff14;
+            --neon-yellow: #fffe00;
+            --text-color: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body {
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-            background-color: #090813;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
             overflow-x: hidden;
-            font-family: 'Outfit', sans-serif;
+        }
+        header { text-align: center; margin-bottom: 15px; }
+        h1 {
+            font-size: 1.6rem;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px rgba(0, 243, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .subtitle { font-size: 0.85rem; color: #a5b4fc; margin-top: 3px; }
+        
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 450px;
+            gap: 15px;
+        }
+        
+        /* Ruleta */
+        .wheel-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 10px auto;
+        }
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid var(--neon-pink);
+            z-index: 20;
+            filter: drop-shadow(0 0 8px var(--neon-pink));
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 25px var(--neon-pink), inset 0 0 15px rgba(255, 255, 255, 0.3);
+            border: 4px solid var(--neon-cyan);
+        }
+        
+        /* Botón Gigante de Giro */
+        .spin-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--neon-pink), #ff5e00);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px var(--neon-pink);
+            transition: transform 0.1s, box-shadow 0.1s;
+            letter-spacing: 1px;
+        }
+        .spin-btn:active { transform: scale(0.96); box-shadow: 0 0 10px var(--neon-pink); }
+
+        /* Panel de gestión / premios */
+        .panel {
+            background-color: var(--panel-bg);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            padding: 15px;
+            width: 100%;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+        .panel h2 { font-size: 1.1rem; color: var(--neon-yellow); margin-bottom: 10px; text-align: center; }
+        
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #4b5563;
+            background-color: #1f1a3a;
+            color: white;
+            font-size: 0.95rem;
+        }
+        .add-btn {
+            padding: 0 16px;
+            background-color: var(--neon-lime);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .items-list {
+            max-height: 120px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 4px;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
         }
 
-        /* Texto Neón Glow */
-        .text-glow-fuchsia {
-            text-shadow: 0 0 5px #ff007f, 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 40px #ff007f;
+        /* Modales */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
-        .text-glow-cyan {
-            text-shadow: 0 0 5px #00f3ff, 0 0 10px #00f3ff, 0 0 20px #00f3ff;
+        .modal.show { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: linear-gradient(145deg, #1f1a3a, #110c22);
+            border: 3px solid var(--neon-lime);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            box-shadow: 0 0 30px var(--neon-lime);
+            animation: popIn 0.3s ease;
         }
-        .text-glow-yellow {
-            text-shadow: 0 0 5px #ffe600, 0 0 10px #ffe600, 0 0 20px #ffe600;
+        .modal-content h3 { color: var(--neon-yellow); font-size: 1.3rem; margin-bottom: 10px; text-transform: uppercase; }
+        .modal-content p { font-size: 1.3rem; font-weight: bold; margin-bottom: 15px; color: #fff; }
+        
+        .trivial-box {
+            background: rgba(0,0,0,0.4);
+            border: 2px dashed var(--neon-cyan);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .trivial-question { color: var(--neon-cyan); font-size: 1.1rem; margin-bottom: 10px; }
+        .trivial-answer { color: var(--neon-lime); font-size: 1rem; font-weight: normal; display: none; margin-top: 8px; }
+        
+        .btn-reveal {
+            background: var(--neon-yellow);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 10px;
         }
 
-        /* Bordes Resplandecientes */
-        .border-glow-fuchsia {
-            box-shadow: 0 0 10px #ff007f, inset 0 0 10px #ff007f;
+        .close-modal {
+            background: var(--neon-pink);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-pink);
         }
-        .border-glow-lime {
-            box-shadow: 0 0 10px #39ff14, inset 0 0 10px #39ff14;
-        }
-
-        /* Animación Pulso Caótico */
-        @keyframes chaosPulse {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(1.02) rotate(-1deg); }
-            75% { transform: scale(0.98) rotate(1deg); }
-        }
-        .animate-chaos {
-            animation: chaosPulse 2s infinite ease-in-out;
-        }
-
-        /* Scrollbar personalizado para el panel de edición */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #121026;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #ff007f;
-            border-radius: 4px;
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
-<body class="text-white min-h-screen flex flex-col justify-between p-3 sm:p-5 relative">
+<body>
 
-    <!-- FONDOS Y EFECTOS AMBIENTALES DE CAOS -->
-    <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-neonFuchsia/15 rounded-full blur-[100px] pointer-events-none"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-neonCyan/15 rounded-full blur-[100px] pointer-events-none"></div>
-
-    <!-- ENCABEZADO SUPERIOR -->
-    <header class="text-center my-2 relative z-10">
-        <div class="inline-block px-4 py-1 bg-neonFuchsia/10 border border-neonFuchsia/40 rounded-full mb-1">
-            <span class="text-xs font-bold text-neonLime tracking-widest uppercase animate-pulse">⚡ TIKTOK LIVE EDITION ⚡</span>
-        </div>
-        <h1 class="text-3xl sm:text-5xl font-black italic tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-neonFuchsia via-neonYellow to-neonCyan text-glow-fuchsia leading-tight uppercase font-marker">
-            LA RULETA DEL CAOS
-        </h1>
-        <p class="text-sm font-bold text-neonCyan tracking-widest text-glow-cyan uppercase">
-            DE CHICAOHYEAH
-        </p>
+    <header>
+        <h1>La Ruleta del Caos</h1>
+        <div class="subtitle">ChicaOhyeah TikTok Live</div>
     </header>
 
-    <!-- SECCIÓN PRINCIPAL: CANVA Y RULETA -->
-    <main class="flex-1 flex flex-col items-center justify-center my-2 relative z-10 max-w-md mx-auto w-full">
-        
-        <!-- CONTENEDOR DE LA RULETA -->
-        <div class="relative w-full aspect-square max-w-[360px] sm:max-w-[400px] flex items-center justify-center p-2">
-            
-            <!-- MARCO EXTERIOR NEÓN EN RESPLANDOR -->
-            <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-neonFuchsia via-neonPurple to-neonCyan p-1.5 animate-chaos shadow-neon-fuchsia">
-                <div class="w-full h-full bg-darkBg rounded-full"></div>
-            </div>
-
-            <!-- PUNTERO RESPLANDECIENTE TOP CENTER -->
-            <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-30 filter drop-shadow-[0_0_12px_#ffe600]">
-                <svg width="45" height="55" viewBox="0 0 40 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 50 L2 10 Q0 0 10 0 L30 0 Q40 0 38 10 Z" fill="#ffe600" stroke="#ffffff" stroke-width="2"/>
-                    <circle cx="20" cy="15" r="5" fill="#ff007f" />
-                </svg>
-            </div>
-
-            <!-- BOTÓN CENTRAL DE LOGO / ADORNO -->
-            <div class="absolute z-20 w-16 h-16 sm:w-20 sm:h-20 bg-darkBg border-4 border-neonYellow rounded-full shadow-neon-yellow flex items-center justify-center pointer-events-none">
-                <span class="text-2xl sm:text-3xl">🔥</span>
-            </div>
-
-            <!-- CANVAS INTERACTIVO RULETA -->
-            <canvas id="wheelCanvas" class="w-full h-full rounded-full relative z-10 transition-transform duration-75"></canvas>
+    <div class="main-container">
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <canvas id="wheel" width="400" height="400"></canvas>
         </div>
 
-        <!-- BOTÓN GIGANTE ACCIÓN 'GIRAR' -->
-        <div class="w-full mt-6 px-2">
-            <button id="spinBtn" onclick="spinWheel()" class="w-full py-5 sm:py-6 bg-gradient-to-r from-neonFuchsia via-neonPurple to-neonCyan text-white font-black text-2xl sm:text-3xl rounded-2xl border-2 border-white shadow-neon-fuchsia active:scale-95 transition-all duration-150 flex items-center justify-center gap-3 uppercase tracking-wider">
-                <span>🎰</span> ¡GIRAR RULETA! <span>🎰</span>
-            </button>
-        </div>
+        <button class="spin-btn" id="spinButton">¡Girar Ruleta!</button>
 
-    </main>
-
-    <!-- BARRA Y PANELES INFERIORES DE CONTROL -->
-    <footer class="relative z-10 max-w-md mx-auto w-full mt-2">
-        <div class="grid grid-cols-2 gap-3">
-            <!-- BOTÓN ABRIR EDITOR -->
-            <button onclick="togglePanel('editPanel')" class="py-3 px-4 bg-cardBg border border-neonCyan/50 rounded-xl text-neonCyan font-bold text-sm sm:text-base flex items-center justify-center gap-2 active:bg-neonCyan/20 shadow-neon-cyan/20">
-                <span>✏️</span> EDITAR CASILLAS
-            </button>
-            <!-- BOTÓN OPCIONES DE SONIDO/CONFIG -->
-            <button onclick="toggleAudioSetting()" id="audioToggleBtn" class="py-3 px-4 bg-cardBg border border-neonLime/50 rounded-xl text-neonLime font-bold text-sm sm:text-base flex items-center justify-center gap-2 active:bg-neonLime/20">
-                <span>🔊</span> SONIDO: ON
-            </button>
-        </div>
-    </footer>
-
-    <!-- MODAL SLIDE-UP: PANEL DE EDICIÓN DE CASILLAS -->
-    <div id="editPanel" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex flex-col justify-end transition-all duration-300">
-        <div class="bg-cardBg border-t-2 border-neonFuchsia rounded-t-3xl p-5 max-h-[85vh] flex flex-col w-full max-w-md mx-auto shadow-neon-fuchsia">
-            
-            <!-- CABECERA MODAL -->
-            <div class="flex justify-between items-center pb-4 border-b border-gray-800">
-                <h2 class="text-xl font-black text-neonFuchsia flex items-center gap-2 uppercase tracking-wide">
-                    <span>⚡</span> Opciones de Caos
-                </h2>
-                <button onclick="togglePanel('editPanel')" class="text-gray-400 text-2xl font-bold px-3 py-1">✕</button>
+        <div class="panel">
+            <h2>Personalizar Casillas</h2>
+            <div class="input-group">
+                <input type="text" id="newItemText" placeholder="Añade nuevo reto o opción...">
+                <button class="add-btn" id="addBtn">Añadir</button>
             </div>
-
-            <!-- AÑADIR NUEVA CASILLA -->
-            <div class="my-4 flex gap-2">
-                <input type="text" id="newItemInput" placeholder="Escribe premio o castigo..." class="flex-1 bg-darkBg border border-neonCyan/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-neonCyan text-base">
-                <button onclick="addItem()" class="bg-neonCyan text-darkBg font-black px-5 rounded-xl text-lg active:scale-95 shadow-neon-cyan">
-                    +
-                </button>
-            </div>
-
-            <!-- LISTADO EDITABLE (SCROLLABLE) -->
-            <div id="itemsList" class="flex-1 overflow-y-auto space-y-2.5 my-2 pr-1">
-                <!-- Generado dinámicamente -->
-            </div>
-
-            <!-- BOTONES ACCIONES RÁPIDAS -->
-            <div class="pt-4 border-t border-gray-800 flex gap-2">
-                <button onclick="resetDefaultItems()" class="flex-1 py-3 bg-gray-800 text-gray-300 font-bold rounded-xl text-xs uppercase tracking-wider">
-                    Restablecer
-                </button>
-                <button onclick="togglePanel('editPanel')" class="flex-1 py-3 bg-neonFuchsia text-white font-black rounded-xl text-sm uppercase tracking-wider shadow-neon-fuchsia">
-                    Guardar y Cerrar
-                </button>
-            </div>
+            <div class="items-list" id="itemsList"></div>
         </div>
     </div>
 
-    <!-- MODAL RESULTADO (ANUNCIO NEÓN TIKTOK) -->
-    <div id="resultModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-cardBg border-2 border-neonYellow rounded-3xl p-6 sm:p-8 w-full max-w-sm text-center relative shadow-neon-yellow animate-chaos">
-            
-            <div class="absolute -top-10 left-1/2 -translate-x-1/2 text-6xl">
-                🎉
+    <!-- Modal de Resultado Normal / Trivial -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">¡Resultado del Caos!</h3>
+            <p id="resultText">Premio</p>
+
+            <div class="trivial-box" id="trivialBox" style="display: none;">
+                <div class="trivial-question" id="trivialQuestion">¿Pregunta?</div>
+                <button class="btn-reveal" id="revealBtn">Ver Respuesta</button>
+                <div class="trivial-answer" id="trivialAnswer">Respuesta correcta</div>
             </div>
 
-            <p class="text-neonYellow font-bold text-sm tracking-widest uppercase mb-2 mt-2">¡EL CAOS HA DECIDIDO!</p>
-            
-            <!-- TEXTO DEL PREMIO / CASTIGO -->
-            <div class="py-6 px-2 my-2 border-y border-neonYellow/30">
-                <h3 id="resultText" class="text-3xl sm:text-4xl font-black text-white leading-tight font-marker break-words">
-                    <!-- Resultado aquí -->
-                </h3>
-            </div>
-
-            <!-- BOTÓN ACEPTAR / CONTINUAR -->
-            <button onclick="closeResultModal()" class="w-full mt-4 py-4 bg-neonYellow text-darkBg font-black text-xl rounded-xl uppercase tracking-wider shadow-neon-yellow active:scale-95 transition-transform">
-                ¡CONTINUAR DIRECTO!
-            </button>
+            <button class="close-modal" id="closeModal">¡Entendido!</button>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LÓGICA DE LA RULETA -->
     <script>
-        // 1. LISTA DE ELEMENTOS PREDETERMINADOS (Guardados en LocalStorage)
-        const DEFAULT_ITEMS = [
-            "💃 Baila 15 seg",
-            "🎤 Dueto Cantado",
-            "🔥 20 Flexiones",
-            "🤪 Caras Feas x3",
-            "🌶️ Cucharada Picosa",
-            "👑 Regala Mod",
-            "❓ Pregunta Incómoda",
-            "🎁 Saludo Especial"
+        const defaultItems = [
+            "🧠 TRIVIAL", "Dueto improvisado", "Imita a un famoso", 
+            "Puntos dobles", "🧠 TRIVIAL", "Baila la macarena", 
+            "Pregunta incómoda", "Gira de nuevo"
         ];
 
-        // COLORES NEÓN PARA CASILLAS
-        const NEON_COLORS = [
-            "#ff007f", // Fucsia
-            "#00f3ff", // Cian
-            "#39ff14", // Verde Lima
-            "#ffe600", // Amarillo
-            "#b026ff", // Púrpura
-            "#ff5e00"  // Naranja
+        // Banco de preguntas de Trivial para el directo
+        const preguntasTrivial = [
+            { q: "¿Cuál es el planeta más grande del sistema solar?", a: "Júpiter" },
+            { q: "¿En qué año llegó el ser humano a la Luna?", a: "1969" },
+            { q: "¿Cuál es el océano más grande de la Tierra?", a: "Océano Pacífico" },
+            { q: "¿Cuántos huesos tiene el cuerpo humano adulto?", a: "206 huesos" },
+            { q: "¿Qué instrumento musical tiene teclas, martillos y cuerdas?", a: "El Piano" },
+            { q: "¿Cuál es el país más grande del mundo por superficie?", a: "Rusia" },
+            { q: "¿En qué país se inventó la pizza?", a: "Italia" },
+            { q: "¿Cuál es el animal terrestre más rápido del mundo?", a: "El guepardo" },
+            { q: "¿Qué color resulta de mezclar azul y amarillo?", a: "Verde" },
+            { q: "¿Cuántos minutos tiene una hora?", a: "60 minutos" }
         ];
 
-        let items = JSON.parse(localStorage.getItem('ruleta_caos_items')) || [...DEFAULT_ITEMS];
-        let audioEnabled = true;
+        let items = JSON.parse(localStorage.getItem('ruleta_caos_items')) || defaultItems;
 
-        // ESTADO DE LA RULETA
-        let canvas = document.getElementById('wheelCanvas');
-        let ctx = canvas.getContext('2d');
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const spinButton = document.getElementById('spinButton');
+        const itemsList = document.getElementById('itemsList');
+        const newItemText = document.getElementById('newItemText');
+        const addBtn = document.getElementById('addBtn');
+        const resultModal = document.getElementById('resultModal');
+        const resultText = document.getElementById('resultText');
+        const modalTitle = document.getElementById('modalTitle');
+        const trivialBox = document.getElementById('trivialBox');
+        const trivialQuestion = document.getElementById('trivialQuestion');
+        const trivialAnswer = document.getElementById('trivialAnswer');
+        const revealBtn = document.getElementById('revealBtn');
+        const closeModal = document.getElementById('closeModal');
+
         let startAngle = 0;
         let arc = Math.PI / (items.length / 2);
         let spinTimeout = null;
-        let spinAngleStart = 10;
+        let spinAngleStart = 0;
         let spinTime = 0;
         let spinTimeTotal = 0;
         let isSpinning = false;
-        let lastTickSegment = -1;
 
-        // WEB AUDIO API PARA EFECTOS SONOROS
-        let audioCtx = null;
-
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-
-        // Sonido Sintetizado: Ticks de la ruleta
-        function playTickSound() {
-            if (!audioEnabled) return;
-            try {
-                initAudio();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
-                
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.04);
-            } catch(e) {}
-        }
-
-        // Sonido Sintetizado: Fanfarria de victoria
-        function playWinSound() {
-            if (!audioEnabled) return;
-            try {
-                initAudio();
-                const notes = [261.63, 329.63, 392.00, 523.25]; // C, E, G, High C
-                notes.forEach((freq, index) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.value = freq;
-                    
-                    const startTime = audioCtx.currentTime + (index * 0.1);
-                    gain.gain.setValueAtTime(0.3, startTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
-
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-
-                    osc.start(startTime);
-                    osc.stop(startTime + 0.3);
-                });
-            } catch(e) {}
-        }
-
-        // AJUSTAR TAMAÑO Y DIBUJAR RULETA
-        function resizeCanvas() {
-            const container = canvas.parentElement;
-            const size = container.clientWidth - 16;
-            canvas.width = size * window.devicePixelRatio;
-            canvas.height = size * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-            drawWheel();
-        }
+        const colors = ['#ff007f', '#00f3ff', '#39ff14', '#fffe00', '#9333ea', '#ff5e00', '#3b82f6', '#ec4899'];
 
         function drawWheel() {
             if (!canvas.getContext) return;
-            const size = canvas.width / window.devicePixelRatio;
-            const outsideRadius = size / 2 - 10;
-            const textRadius = outsideRadius * 0.68;
-            const insideRadius = 35;
+            arc = Math.PI / (items.length / 2);
+            ctx.clearRect(0, 0, 400, 400);
 
-            ctx.clearRect(0, 0, size, size);
-            arc = (2 * Math.PI) / items.length;
+            let outsideRadius = 185;
+            let textRadius = 130;
+            let insideRadius = 30;
 
-            const centerX = size / 2;
-            const centerY = size / 2;
+            for(let i = 0; i < items.length; i++) {
+                let angle = startAngle + i * arc;
+                ctx.fillStyle = colors[i % colors.length];
 
-            for (let i = 0; i < items.length; i++) {
-                const angle = startAngle + i * arc;
-                ctx.fillStyle = NEON_COLORS[i % NEON_COLORS.length];
-
-                // Dibujar Quesito / Sector
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, outsideRadius, angle, angle + arc, false);
-                ctx.arc(centerX, centerY, insideRadius, angle + arc, angle, true);
-                ctx.fill();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = '#090813';
+                ctx.arc(200, 200, outsideRadius, angle, angle + arc, false);
+                ctx.arc(200, 200, insideRadius, angle + arc, angle, true);
                 ctx.stroke();
+                ctx.fill();
 
-                // Dibujar Texto
                 ctx.save();
-                ctx.fillStyle = '#090813';
-                ctx.font = 'bold 14px Outfit, sans-serif';
-                ctx.translate(
-                    centerX + Math.cos(angle + arc / 2) * textRadius,
-                    centerY + Math.sin(angle + arc / 2) * textRadius
-                );
+                ctx.shadowOffsetX = -1;
+                ctx.shadowOffsetY = -1;
+                ctx.shadowBlur = 2;
+                ctx.shadowColor = "rgb(0,0,0)";
+                ctx.fillStyle = "#000000";
+                ctx.translate(200 + Math.cos(angle + arc / 2) * textRadius, 
+                              200 + Math.sin(angle + arc / 2) * textRadius);
                 ctx.rotate(angle + arc / 2 + Math.PI / 2);
-                
-                const text = items[i];
-                const truncatedText = text.length > 16 ? text.substring(0, 14) + '..' : text;
-                ctx.fillText(truncatedText, -ctx.measureText(truncatedText).width / 2, 0);
+                let text = items[i];
+                let maxLength = 16;
+                if(text.length > maxLength) text = text.substring(0, maxLength) + '...';
+                ctx.font = 'bold 13px sans-serif';
+                ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
                 ctx.restore();
             }
-        }
 
-        // LÓGICA DE GIRO
-        function spinWheel() {
-            if (isSpinning || items.length === 0) return;
-
-            // Trigger audio context on tap
-            initAudio();
-
-            // Vibración en Android al pulsar
-            if (navigator.vibrate) navigator.vibrate(50);
-
-            isSpinning = true;
-            document.getElementById('spinBtn').disabled = true;
-            document.getElementById('spinBtn').classList.add('opacity-50', 'scale-95');
-
-            spinAngleStart = Math.random() * 10 + 20;
-            spinTime = 0;
-            spinTimeTotal = Math.random() * 3000 + 4000; // 4 a 7 segundos de giro
-            lastTickSegment = -1;
-
-            rotateWheel();
+            ctx.beginPath();
+            ctx.arc(200, 200, insideRadius, 0, 2 * Math.PI, false);
+            ctx.fillStyle = '#151124';
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#00f3ff';
+            ctx.stroke();
         }
 
         function rotateWheel() {
-            spinTime += 20;
-            if (spinTime >= spinTimeTotal) {
+            spinTime += 30;
+            if(spinTime >= spinTimeTotal) {
                 stopRotateWheel();
                 return;
             }
-
-            // Desaceleración suave (Ease-Out)
-            const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
-            startAngle += (spinAngle * Math.PI) / 180;
+            let spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+            startAngle += (spinAngle * Math.PI / 180);
             drawWheel();
-
-            // Calcular en qué segmento estamos para el sonido de TICK
-            const degrees = (startAngle * 180) / Math.PI + 90;
-            const arcd = (arc * 180) / Math.PI;
-            const currentSegment = Math.floor((360 - (degrees % 360)) / arcd);
-            
-            if (currentSegment !== lastTickSegment) {
-                playTickSound();
-                if (navigator.vibrate) navigator.vibrate(15); // Pequeña vibración por cada tick
-                lastTickSegment = currentSegment;
-            }
-
-            spinTimeout = requestAnimationFrame(rotateWheel);
+            spinTimeout = setTimeout(rotateWheel, 30);
         }
 
         function stopRotateWheel() {
-            cancelAnimationFrame(spinTimeout);
+            let degrees = startAngle * 180 / Math.PI + 90;
+            let arcd = arc * 180 / Math.PI;
+            let index = Math.floor((360 - degrees % 360) / arcd);
+            ctx.save();
+            let winningText = items[index];
+
+            if (winningText.toLowerCase().includes("trivial")) {
+                modalTitle.textContent = "🧠 ¡RETO TRIVIAL!";
+                resultText.textContent = "¡Pregunta para el chat!";
+                
+                // Seleccionar pregunta aleatoria
+                let randomQ = preguntasTrivial[Math.floor(Math.random() * preguntasTrivial.length)];
+                trivialQuestion.textContent = randomQ.q;
+                trivialAnswer.textContent = "Respuesta: " + randomQ.a;
+                trivialAnswer.style.display = "none";
+                revealBtn.style.display = "inline-block";
+                trivialBox.style.display = "block";
+            } else {
+                modalTitle.textContent = "¡Resultado del Caos!";
+                resultText.textContent = winningText;
+                trivialBox.style.display = "none";
+            }
+
+            resultModal.classList.add('show');
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+            
             isSpinning = false;
-            document.getElementById('spinBtn').disabled = false;
-            document.getElementById('spinBtn').classList.remove('opacity-50', 'scale-95');
-
-            // Calcular Ganador (Arriba - Puntero a 270 grados / Math.PI * 1.5)
-            const degrees = (startAngle * 180) / Math.PI + 90;
-            const arcd = (arc * 180) / Math.PI;
-            const index = Math.floor((360 - (degrees % 360)) / arcd) % items.length;
-            const winningItem = items[index];
-
-            // Vibración final más fuerte
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-
-            // Efecto Sonoro Ganador y Modal
-            playWinSound();
-            showResult(winningItem);
+            spinButton.disabled = false;
+            ctx.restore();
         }
 
         function easeOut(t, b, c, d) {
-            const ts = (t /= d) * t;
-            const tc = ts * t;
-            return b + c * (tc + -3 * ts + 3 * t);
+            let ts = (t/=d)*t;
+            let tc = ts*t;
+            return b+c*(tc + -3*ts + 3*t);
         }
 
-        // MOSTRAR Y CERRAR RESULTADOS
-        function showResult(text) {
-            document.getElementById('resultText').innerText = text;
-            document.getElementById('resultModal').classList.remove('hidden');
+        function spin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            spinButton.disabled = true;
+            spinAngleStart = Math.random() * 10 + 20;
+            spinTime = 0;
+            spinTimeTotal = Math.random() * 2000 + 3000;
+            rotateWheel();
         }
 
-        function closeResultModal() {
-            document.getElementById('resultModal').classList.add('hidden');
-        }
-
-        // PANEL DE EDICIÓN Y GESTIÓN DE ITEMS
-        function renderItemsList() {
-            const container = document.getElementById('itemsList');
-            container.innerHTML = '';
-
+        function updateList() {
+            itemsList.innerHTML = '';
             items.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'flex items-center gap-2 bg-darkBg p-2.5 rounded-xl border border-gray-800';
-                div.innerHTML = `
-                    <span class="w-3 h-3 rounded-full" style="background-color: ${NEON_COLORS[index % NEON_COLORS.length]}"></span>
-                    <input type="text" value="${item}" onchange="updateItem(${index}, this.value)" class="flex-1 bg-transparent text-white focus:outline-none text-sm font-medium">
-                    <button onclick="removeItem(${index})" class="text-red-500 font-bold px-2 py-1 text-base active:scale-110">✕</button>
-                `;
-                container.appendChild(div);
+                let row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `<span>${item}</span> <button class="delete-btn" onclick="removeItem(${index})">X</button>`;
+                itemsList.appendChild(row);
             });
-        }
-
-        function addItem() {
-            const input = document.getElementById('newItemInput');
-            const val = input.value.trim();
-            if (val) {
-                items.push(val);
-                input.value = '';
-                saveAndRefresh();
-            }
-        }
-
-        function updateItem(index, newValue) {
-            if (newValue.trim()) {
-                items[index] = newValue.trim();
-                saveAndRefresh();
-            }
-        }
-
-        function removeItem(index) {
-            if (items.length <= 2) {
-                alert("¡Debe haber al menos 2 opciones en la ruleta!");
-                return;
-            }
-            items.splice(index, 1);
-            saveAndRefresh();
-        }
-
-        function resetDefaultItems() {
-            items = [...DEFAULT_ITEMS];
-            saveAndRefresh();
-        }
-
-        function saveAndRefresh() {
             localStorage.setItem('ruleta_caos_items', JSON.stringify(items));
-            renderItemsList();
             drawWheel();
         }
 
-        function togglePanel(panelId) {
-            const panel = document.getElementById(panelId);
-            panel.classList.toggle('hidden');
-            if (!panel.classList.contains('hidden')) {
-                renderItemsList();
+        window.removeItem = function(index) {
+            if(items.length <= 2) {
+                alert("¡Necesitas al menos 2 opciones!");
+                return;
             }
+            items.splice(index, 1);
+            updateList();
         }
 
-        function toggleAudioSetting() {
-            audioEnabled = !audioEnabled;
-            const btn = document.getElementById('audioToggleBtn');
-            btn.innerHTML = audioEnabled ? '<span>🔊</span> SONIDO: ON' : '<span>🔇</span> SONIDO: OFF';
-            btn.classList.toggle('text-neonLime', audioEnabled);
-            btn.classList.toggle('text-gray-500', !audioEnabled);
-        }
-
-        // INICIALIZACIÓN
-        window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('DOMContentLoaded', () => {
-            resizeCanvas();
+        addBtn.addEventListener('click', () => {
+            let val = newItemText.value.trim();
+            if(val) {
+                items.push(val);
+                newItemText.value = '';
+                updateList();
+            }
         });
+
+        revealBtn.addEventListener('click', () => {
+            trivialAnswer.style.display = "block";
+            revealBtn.style.display = "none";
+        });
+
+        spinButton.addEventListener('click', spin);
+        closeModal.addEventListener('click', () => resultModal.classList.remove('show'));
+
+        drawWheel();
+        updateList();
     </script>
 </body>
 </html>
-```

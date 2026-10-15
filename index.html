@@ -35,7 +35,7 @@
         }
         .subtitle { font-size: 0.8rem; color: #a5b4fc; margin-top: 2px; }
         
-        /* Contenedor principal en paralelo (Lado a Lado) */
+        /* Contenedor principal Lado a Lado */
         .main-layout {
             display: flex;
             flex-direction: row;
@@ -298,17 +298,21 @@
 
         .trivial-answer { 
             color: var(--neon-lime); 
-            font-size: 0.9rem; 
+            font-size: 0.95rem; 
             font-weight: bold; 
             display: none; 
-            margin-top: 6px; 
+            margin-top: 8px; 
+            padding: 8px;
+            background: rgba(57, 255, 20, 0.1);
+            border-radius: 6px;
+            border: 1px solid var(--neon-lime);
         }
         
         .btn-reveal {
             background: var(--neon-yellow);
             color: #000;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 12px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -390,7 +394,7 @@
                 <div class="box-category" id="boxCategory">CATEGORÍA</div>
                 <div class="box-question" id="boxQuestion">Detalle del reto</div>
                 <div class="options-grid" id="optionsGrid"></div>
-                <button class="btn-reveal" id="revealBtn" style="display:none;">Ver Respuesta Correcta</button>
+                <button class="btn-reveal" id="revealBtn" style="display:none;">Ver Respuesta</button>
                 <div class="trivial-answer" id="trivialAnswer">Respuesta correcta</div>
             </div>
 
@@ -569,6 +573,7 @@
                 boxCategory.textContent = randomQ.cat;
                 boxQuestion.textContent = randomQ.q;
                 trivialAnswer.textContent = "Correcta: " + randomQ.opts[randomQ.correct];
+                revealBtn.textContent = "Ver Respuesta Correcta";
                 revealBtn.style.display = "block";
 
                 const letters = ["A", "B", "C", "D"];
@@ -588,6 +593,20 @@
                     };
                     optionsGrid.appendChild(btn);
                 });
+                customBox.style.display = "block";
+
+            } else if (textUpper.includes("PÉNDULO") || textUpper.includes("PENDULO") || winningText.includes("🔮")) {
+                modalTitle.textContent = "🔮 ¡PREGÚNTALE AL PÉNDULO!";
+                resultText.textContent = `Turno de: ${currentTurnPlayer.textContent}`;
+                boxCategory.textContent = "✨ RITUAL MÍSTICO";
+                boxQuestion.textContent = `¡${currentTurnPlayer.textContent}, formula en voz alta tu pregunta de SÍ o NO al Péndulo!`;
+                
+                // Preparar la respuesta oculta para cuando se pulse el botón
+                let randomAnswer = respuestasPendulo[Math.floor(Math.random() * respuestasPendulo.length)];
+                trivialAnswer.textContent = randomAnswer;
+                revealBtn.textContent = "🔮 Consultar al Péndulo";
+                revealBtn.style.display = "block";
+                
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("GANAS") || textUpper.includes("SUMA")) {
@@ -616,13 +635,6 @@
                 resultText.textContent = `Poder especial para: ${currentTurnPlayer.textContent}`;
                 boxCategory.textContent = "⚡ COMODÍN";
                 boxQuestion.textContent = poderesJoker[Math.floor(Math.random() * poderesJoker.length)];
-                customBox.style.display = "block";
-
-            } else if (textUpper.includes("PÉNDULO") || textUpper.includes("PENDULO") || winningText.includes("🔮")) {
-                modalTitle.textContent = "🔮 ¡PREGÚNTALE AL PÉNDULO!";
-                resultText.textContent = `Pregunta de: ${currentTurnPlayer.textContent}`;
-                boxCategory.textContent = "✨ PREDICCIÓN MÍSTICA";
-                boxQuestion.textContent = respuestasPendulo[Math.floor(Math.random() * respuestasPendulo.length)];
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("REGALOS") || winningText.includes("🎁")) {

@@ -90,7 +90,7 @@
         }
         .spin-btn:active { transform: scale(0.96); box-shadow: 0 0 10px var(--neon-pink); }
 
-        /* Panel de gestión */
+        /* Paneles */
         .panel {
             background-color: var(--panel-bg);
             border: 2px solid var(--neon-cyan);
@@ -99,6 +99,7 @@
             width: 100%;
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
         }
+        .panel.yellow-border { border-color: var(--neon-yellow); box-shadow: 0 0 15px rgba(255, 254, 0, 0.2); }
         .panel h2 { font-size: 1.1rem; color: var(--neon-yellow); margin-bottom: 10px; text-align: center; }
         
         .input-group {
@@ -125,15 +126,16 @@
             cursor: pointer;
         }
         
-        .items-list {
-            max-height: 120px;
+        /* Listas */
+        .items-list, .players-list {
+            max-height: 140px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 6px;
             padding-right: 4px;
         }
-        .item-row {
+        .item-row, .player-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -142,6 +144,38 @@
             border-radius: 8px;
             font-size: 0.9rem;
         }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .player-name { font-weight: bold; color: #fff; }
+        .player-score { 
+            background: var(--neon-pink); 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 12px; 
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 5px;
+        }
+        .score-btn {
+            background: #374151;
+            color: white;
+            border: 1px solid #6b7280;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .score-btn.plus { background: #166534; border-color: var(--neon-lime); color: var(--neon-lime); }
+        .score-btn.minus { background: #991b1b; border-color: #ef4444; color: #fca5a5; }
+
         .delete-btn {
             background: #ef4444;
             color: white;
@@ -276,6 +310,17 @@
 
         <button class="spin-btn" id="spinButton">¡Girar Ruleta!</button>
 
+        <!-- Panel Marcador de Jugadores -->
+        <div class="panel yellow-border">
+            <h2>🏆 Tablero de Puntos</h2>
+            <div class="input-group">
+                <input type="text" id="newPlayerName" placeholder="Nombre del jugador/usuario...">
+                <button class="add-btn" id="addPlayerBtn">Añadir</button>
+            </div>
+            <div class="players-list" id="playersList"></div>
+        </div>
+
+        <!-- Panel Configuración de Casillas -->
         <div class="panel">
             <h2>Personalizar Casillas</h2>
             <div class="input-group">
@@ -286,7 +331,7 @@
         </div>
     </div>
 
-    <!-- Modal Unificado de Resultados -->
+    <!-- Modal Unificado -->
     <div class="modal" id="resultModal">
         <div class="modal-content">
             <h3 id="modalTitle">¡Resultado del Caos!</h3>
@@ -306,9 +351,13 @@
 
     <script>
         const defaultItems = [
-            "🧠 TRIVIAL", "🔮 EL PÉNDULO", "🎁 REGALOS VIP", 
-            "🤫 INCÓMODA", "🃏 EL JOKER", "🧠 TRIVIAL", 
-            "🔮 EL PÉNDULO", "🎁 REGALOS VIP"
+            "🧠 TRIVIAL", "➕ GANAS 1 PUNTO", "🤫 INCÓMODA", 
+            "➖ PIERDES 1 PUNTO", "🃏 EL JOKER", "🔮 EL PÉNDULO", 
+            "➕ GANAS 1 PUNTO", "🎁 REGALOS VIP"
+        ];
+
+        const defaultPlayers = [
+            { name: "Jugador 1", score: 0 }
         ];
 
         const preguntasTrivial = [
@@ -350,6 +399,7 @@
         ];
 
         let items = JSON.parse(localStorage.getItem('ruleta_caos_items')) || defaultItems;
+        let players = JSON.parse(localStorage.getItem('ruleta_caos_players')) || defaultPlayers;
 
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
@@ -357,6 +407,11 @@
         const itemsList = document.getElementById('itemsList');
         const newItemText = document.getElementById('newItemText');
         const addBtn = document.getElementById('addBtn');
+
+        const playersList = document.getElementById('playersList');
+        const newPlayerName = document.getElementById('newPlayerName');
+        const addPlayerBtn = document.getElementById('addPlayerBtn');
+
         const resultModal = document.getElementById('resultModal');
         const resultText = document.getElementById('resultText');
         const modalTitle = document.getElementById('modalTitle');
@@ -451,7 +506,7 @@
 
             if (textUpper.includes("TRIVIAL") || winningText.includes("🧠")) {
                 modalTitle.textContent = "🧠 ¡PREGUNTA TRIVIAL!";
-                resultText.textContent = "¡Responde en el chat!";
+                resultText.textContent = "¡Si aciertas, ganas 1 punto!";
                 let randomQ = preguntasTrivial[Math.floor(Math.random() * preguntasTrivial.length)];
                 boxCategory.textContent = randomQ.cat;
                 boxQuestion.textContent = randomQ.q;
@@ -477,9 +532,23 @@
                 });
                 customBox.style.display = "block";
 
+            } else if (textUpper.includes("GANAS") || textUpper.includes("SUMA")) {
+                modalTitle.textContent = "🎉 ¡PUNTO DE REGALO!";
+                resultText.textContent = "¡Sumale 1 punto manualmente al marcador!";
+                boxCategory.textContent = "⭐ RECOMPENSA";
+                boxQuestion.textContent = "¡Añade +1 punto al jugador activo!";
+                customBox.style.display = "block";
+
+            } else if (textUpper.includes("PIERDES") || textUpper.includes("RESTA")) {
+                modalTitle.textContent = "💥 ¡MALAS NOTICIAS!";
+                resultText.textContent = "¡Réstale 1 punto en el marcador!";
+                boxCategory.textContent = "⚠️ PENALIZACIÓN";
+                boxQuestion.textContent = "¡Quítale -1 punto al jugador activo!";
+                customBox.style.display = "block";
+
             } else if (textUpper.includes("INCÓMODA") || textUpper.includes("INCOMODA") || winningText.includes("🤫")) {
                 modalTitle.textContent = "🤫 ¡ZONA DE SALSEO!";
-                resultText.textContent = "¡Confesión obligatoria!";
+                resultText.textContent = "¡Responde o pierde punto!";
                 boxCategory.textContent = "🔥 PREGUNTA INCÓMODA";
                 boxQuestion.textContent = preguntasIncomodas[Math.floor(Math.random() * preguntasIncomodas.length)];
                 customBox.style.display = "block";
@@ -534,6 +603,7 @@
             rotateWheel();
         }
 
+        // --- Gestión de Casillas ---
         function updateList() {
             itemsList.innerHTML = '';
             items.forEach((item, index) => {
@@ -564,6 +634,50 @@
             }
         });
 
+        // --- Gestión de Jugadores y Marcador ---
+        function updatePlayersList() {
+            playersList.innerHTML = '';
+            if (players.length === 0) {
+                playersList.innerHTML = '<div style="text-align:center; color:#9ca3af; font-size:0.85rem;">No hay jugadores. ¡Añade el primero!</div>';
+            }
+            players.forEach((player, index) => {
+                let row = document.createElement('div');
+                row.className = 'player-row';
+                row.innerHTML = `
+                    <div class="player-info">
+                        <span class="player-name">${player.name}</span>
+                        <span class="player-score">${player.score} pts</span>
+                    </div>
+                    <div class="player-controls">
+                        <button class="score-btn plus" onclick="changeScore(${index}, 1)">+1</button>
+                        <button class="score-btn minus" onclick="changeScore(${index}, -1)">-1</button>
+                        <button class="delete-btn" onclick="removePlayer(${index})">🗑️</button>
+                    </div>
+                `;
+                playersList.appendChild(row);
+            });
+            localStorage.setItem('ruleta_caos_players', JSON.stringify(players));
+        }
+
+        window.changeScore = function(index, delta) {
+            players[index].score += delta;
+            updatePlayersList();
+        };
+
+        window.removePlayer = function(index) {
+            players.splice(index, 1);
+            updatePlayersList();
+        };
+
+        addPlayerBtn.addEventListener('click', () => {
+            let nameVal = newPlayerName.value.trim();
+            if(nameVal) {
+                players.push({ name: nameVal, score: 0 });
+                newPlayerName.value = '';
+                updatePlayersList();
+            }
+        });
+
         revealBtn.addEventListener('click', () => {
             trivialAnswer.style.display = "block";
             revealBtn.style.display = "none";
@@ -574,6 +688,7 @@
 
         drawWheel();
         updateList();
+        updatePlayersList();
     </script>
 </body>
 </html>

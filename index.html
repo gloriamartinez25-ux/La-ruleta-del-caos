@@ -180,7 +180,7 @@
         .modal-content h3 { color: var(--neon-yellow); font-size: 1.3rem; margin-bottom: 5px; text-transform: uppercase; }
         .modal-content p { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #fff; }
         
-        .trivial-box, .awkward-box {
+        .trivial-box, .awkward-box, .joker-box {
             background: rgba(0,0,0,0.5);
             border: 2px dashed var(--neon-cyan);
             padding: 15px;
@@ -307,14 +307,20 @@
                 <div class="box-question" id="awkwardQuestion">¿Pregunta incómoda?</div>
             </div>
 
+            <!-- Caja Joker -->
+            <div class="joker-box" id="jokerBox" style="display: none;">
+                <div class="box-category" style="color: var(--neon-yellow);">🃏 COMODÍN DEL CAOS</div>
+                <div class="box-question" id="jokerQuestion" style="color: var(--neon-lime);">¡Poder especial!</div>
+            </div>
+
             <button class="close-modal" id="closeModal">¡Entendido!</button>
         </div>
     </div>
 
     <script>
         const defaultItems = [
-            "🧠 TRIVIAL", "Dueto improvisado", "🤫 Pregunta incómoda", 
-            "Puntos dobles", "🧠 TRIVIAL", "Baila la macarena", 
+            "🧠 TRIVIAL", "🃏 EL JOKER", "🤫 Pregunta incómoda", 
+            "Puntos dobles", "🧠 TRIVIAL", "🃏 EL JOKER", 
             "🤫 Pregunta incómoda", "Gira de nuevo"
         ];
 
@@ -330,7 +336,7 @@
             { cat: "🌍 Cultura General", q: "¿En qué océano se hundió el Titanic?", opts: ["Océano Pacífico", "Océano Índico", "Océano Atlántico", "Océano Ártico"], correct: 2 }
         ];
 
-        // Banco de Preguntas Incómodas para el directo
+        // Banco de Preguntas Incómodas
         const preguntasIncomodas = [
             "¿Cuál ha sido tu mayor ridículo en público y en qué año fue?",
             "Si pudieras borrar un mensaje de WhatsApp que mandaste por error, ¿a quién iba dirigido?",
@@ -342,6 +348,16 @@
             "¿Cuál es el capricho más absurdo en el que te has gastado dinero?",
             "¿Qué manía secreta tienes cuando estás a solas en tu habitación?",
             "Si tu ex tuviera que definirte con una sola palabra, ¿cuál crees que diría?"
+        ];
+
+        // Banco de Poderes del Joker
+        const poderesJoker = [
+            "¡Poder Absoluto! Elige a alguien del chat para que cumpla el próximo castigo por ti.",
+            "¡Inmunidad Total! Te libras de cualquier castigo y ganas el doble de puntos.",
+            "¡Doble Giro! Vuelve a girar la ruleta inmediatamente y suma los dos premios.",
+            "¡El Chat Manda! Deja que los espectadores decidan tu próximo reto mediante votación rápida en comentarios.",
+            "¡Intercambio! Pásale el reto o la pregunta que te ha tocado a la última persona que envió un regalo.",
+            "¡Momento Saludo! Envía un saludo épico y personalizado a los últimos 3 seguidores que han entrado al directo."
         ];
 
         let items = JSON.parse(localStorage.getItem('ruleta_caos_items')) || defaultItems;
@@ -365,6 +381,10 @@
 
         const awkwardBox = document.getElementById('awkwardBox');
         const awkwardQuestion = document.getElementById('awkwardQuestion');
+
+        const jokerBox = document.getElementById('jokerBox');
+        const jokerQuestion = document.getElementById('jokerQuestion');
+
         const closeModal = document.getElementById('closeModal');
 
         let startAngle = 0;
@@ -444,10 +464,12 @@
             let textUpper = winningText.toUpperCase();
             let isTrivial = textUpper.includes("TRIVIAL") || winningText.includes("🧠");
             let isAwkward = textUpper.includes("INCÓMODA") || textUpper.includes("INCOMODA") || winningText.includes("🤫");
+            let isJoker = textUpper.includes("JOKER") || winningText.includes("🃏");
 
             // Ocultar cajas por defecto
             trivialBox.style.display = "none";
             awkwardBox.style.display = "none";
+            jokerBox.style.display = "none";
 
             if (isTrivial) {
                 modalTitle.textContent = "🧠 ¡PREGUNTA TRIVIAL!";
@@ -488,6 +510,14 @@
                 let randomAwkward = preguntasIncomodas[Math.floor(Math.random() * preguntasIncomodas.length)];
                 awkwardQuestion.textContent = randomAwkward;
                 awkwardBox.style.display = "block";
+
+            } else if (isJoker) {
+                modalTitle.textContent = "🃏 ¡HA SALIDO EL JOKER!";
+                resultText.textContent = "¡Poder oculto activado!";
+                
+                let randomJoker = poderesJoker[Math.floor(Math.random() * poderesJoker.length)];
+                jokerQuestion.textContent = randomJoker;
+                jokerBox.style.display = "block";
 
             } else {
                 modalTitle.textContent = "¡Resultado del Caos!";

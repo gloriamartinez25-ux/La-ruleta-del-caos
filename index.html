@@ -169,25 +169,70 @@
         .modal-content {
             background: linear-gradient(145deg, #1f1a3a, #110c22);
             border: 3px solid var(--neon-lime);
-            padding: 25px;
+            padding: 20px;
             border-radius: 20px;
             text-align: center;
-            max-width: 90%;
+            width: 90%;
+            max-width: 400px;
             box-shadow: 0 0 30px var(--neon-lime);
             animation: popIn 0.3s ease;
         }
-        .modal-content h3 { color: var(--neon-yellow); font-size: 1.3rem; margin-bottom: 10px; text-transform: uppercase; }
-        .modal-content p { font-size: 1.3rem; font-weight: bold; margin-bottom: 15px; color: #fff; }
+        .modal-content h3 { color: var(--neon-yellow); font-size: 1.3rem; margin-bottom: 5px; text-transform: uppercase; }
+        .modal-content p { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #fff; }
         
         .trivial-box {
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             border: 2px dashed var(--neon-cyan);
-            padding: 15px;
+            padding: 12px;
             border-radius: 12px;
             margin-bottom: 15px;
+            text-align: left;
         }
-        .trivial-question { color: var(--neon-cyan); font-size: 1.1rem; margin-bottom: 10px; }
-        .trivial-answer { color: var(--neon-lime); font-size: 1rem; font-weight: normal; display: none; margin-top: 8px; }
+        .trivial-category {
+            font-size: 0.8rem;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+        .trivial-question { 
+            color: var(--neon-cyan); 
+            font-size: 1rem; 
+            margin-bottom: 12px; 
+            line-height: 1.3; 
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .option-btn {
+            background: #2a224a;
+            color: white;
+            border: 1px solid var(--neon-cyan);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .option-btn.correct { background: #15803d !important; border-color: var(--neon-lime) !important; color: white; }
+        .option-btn.wrong { background: #b91c1c !important; border-color: #ef4444 !important; color: white; }
+
+        .trivial-answer { 
+            color: var(--neon-lime); 
+            font-size: 0.95rem; 
+            font-weight: bold; 
+            display: none; 
+            margin-top: 8px; 
+            text-align: center;
+        }
         
         .btn-reveal {
             background: var(--neon-yellow);
@@ -197,7 +242,8 @@
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            margin-bottom: 10px;
+            width: 100%;
+            font-size: 0.85rem;
         }
 
         .close-modal {
@@ -210,6 +256,7 @@
             border-radius: 10px;
             cursor: pointer;
             box-shadow: 0 0 10px var(--neon-pink);
+            width: 100%;
         }
         @keyframes popIn {
             0% { transform: scale(0.8); opacity: 0; }
@@ -235,7 +282,7 @@
         <div class="panel">
             <h2>Personalizar Casillas</h2>
             <div class="input-group">
-                <input type="text" id="newItemText" placeholder="Añade nuevo reto o opción...">
+                <input type="text" id="newItemText" placeholder="Añade nuevo reto u opción...">
                 <button class="add-btn" id="addBtn">Añadir</button>
             </div>
             <div class="items-list" id="itemsList"></div>
@@ -249,8 +296,10 @@
             <p id="resultText">Premio</p>
 
             <div class="trivial-box" id="trivialBox" style="display: none;">
+                <div class="trivial-category" id="trivialCategory">CATEGORÍA</div>
                 <div class="trivial-question" id="trivialQuestion">¿Pregunta?</div>
-                <button class="btn-reveal" id="revealBtn">Ver Respuesta</button>
+                <div class="options-grid" id="optionsGrid"></div>
+                <button class="btn-reveal" id="revealBtn">Ver Respuesta Correcta</button>
                 <div class="trivial-answer" id="trivialAnswer">Respuesta correcta</div>
             </div>
 
@@ -265,18 +314,31 @@
             "Pregunta incómoda", "Gira de nuevo"
         ];
 
-        // Banco de preguntas de Trivial para el directo
+        // Banco de preguntas de Trivial con 4 OPCIONES de respuesta
         const preguntasTrivial = [
-            { q: "¿Cuál es el planeta más grande del sistema solar?", a: "Júpiter" },
-            { q: "¿En qué año llegó el ser humano a la Luna?", a: "1969" },
-            { q: "¿Cuál es el océano más grande de la Tierra?", a: "Océano Pacífico" },
-            { q: "¿Cuántos huesos tiene el cuerpo humano adulto?", a: "206 huesos" },
-            { q: "¿Qué instrumento musical tiene teclas, martillos y cuerdas?", a: "El Piano" },
-            { q: "¿Cuál es el país más grande del mundo por superficie?", a: "Rusia" },
-            { q: "¿En qué país se inventó la pizza?", a: "Italia" },
-            { q: "¿Cuál es el animal terrestre más rápido del mundo?", a: "El guepardo" },
-            { q: "¿Qué color resulta de mezclar azul y amarillo?", a: "Verde" },
-            { q: "¿Cuántos minutos tiene una hora?", a: "60 minutos" }
+            // Música
+            { cat: "🎵 Música", q: "¿Quién canta la famosa canción 'Despacito'?", opts: ["Bad Bunny", "Luis Fonsi", "Daddy Yankee", "Rauw Alejandro"], correct: 1 },
+            { cat: "🎵 Música", q: "¿De qué provincia andaluza es la cantante Rosalía?", opts: ["Barcelona (No es andaluza)", "Sevilla", "Málaga", "Cádiz"], correct: 0 },
+            { cat: "🎵 Música", q: "¿Qué instrumento toca Paco de Lucía?", opts: ["Piano", "Violín", "Guitarra flamenca", "Saxofón"], correct: 2 },
+            { cat: "🎵 Música", q: "¿A qué famoso cantante apodaban 'El Rey del Pop'?", opts: ["Prince", "Michael Jackson", "Elvis Presley", "Freddie Mercury"], correct: 1 },
+
+            // Cine y Televisión
+            { cat: "🎬 Cine & TV", q: "¿Cómo se llama el ogro verde de la película?", opts: ["Shrek", "Fiona", "Asno", "Lord Farquaad"], correct: 0 },
+            { cat: "🎬 Cine & TV", q: "¿En qué país se originó el género Anime?", opts: ["China", "Corea del Sur", "Japón", "Tailandia"], correct: 2 },
+            { cat: "🎬 Cine & TV", q: "¿De qué color es el muñeco de nieve Olaf de Frozen?", opts: ["Azul", "Blanco", "Amarillo", "Transparente"], correct: 1 },
+            { cat: "🎬 Cine & TV", q: "¿Cómo se llama la identidad secreta de Spider-Man?", opts: ["Bruce Wayne", "Peter Parker", "Tony Stark", "Clark Kent"], correct: 1 },
+
+            // Redes y Curiosidades
+            { cat: "📱 Redes Social", q: "¿Qué red social tenía el icono de un pajarito azul?", opts: ["TikTok", "Instagram", "Twitter (X)", "Facebook"], correct: 2 },
+            { cat: "🧠 Curiosidades", q: "¿Cuál es el único mamífero capaz de volar?", opts: ["El murciélago", "El ardilla voladora", "El colibrí", "El pingüino"], correct: 0 },
+            { cat: "🧠 Curiosidades", q: "¿Cuántos corazones tiene un pulpo?", opts: ["1 corazón", "2 corazones", "3 corazones", "4 corazones"], correct: 2 },
+            { cat: "🧠 Curiosidades", q: "¿De qué color es la piel del oso polar debajo del pelo?", opts: ["Rosa", "Blanca", "Negra", "Gris"], correct: 2 },
+
+            // Cultura General y Comida
+            { cat: "🍕 Gastronomía", q: "¿Cuál es el ingrediente principal del guacamole?", opts: ["Tomate", "Aguacate", "Pimiento", "Cebolla"], correct: 1 },
+            { cat: "🌍 Cultura General", q: "¿En qué océano se hundió el Titanic?", opts: ["Océano Pacífico", "Océano Índico", "Océano Atlántico", "Océano Ártico"], correct: 2 },
+            { cat: "🌍 Cultura General", q: "¿Cuántos días tiene un año bisiesto?", opts: ["365 días", "366 días", "364 días", "367 días"], correct: 1 },
+            { cat: "🌍 Cultura General", q: "¿Cuál es la capital de Italia?", opts: ["Milán", "Venecia", "Nápoles", "Roma"], correct: 3 }
         ];
 
         let items = JSON.parse(localStorage.getItem('ruleta_caos_items')) || defaultItems;
@@ -291,7 +353,9 @@
         const resultText = document.getElementById('resultText');
         const modalTitle = document.getElementById('modalTitle');
         const trivialBox = document.getElementById('trivialBox');
+        const trivialCategory = document.getElementById('trivialCategory');
         const trivialQuestion = document.getElementById('trivialQuestion');
+        const optionsGrid = document.getElementById('optionsGrid');
         const trivialAnswer = document.getElementById('trivialAnswer');
         const revealBtn = document.getElementById('revealBtn');
         const closeModal = document.getElementById('closeModal');
@@ -370,16 +434,40 @@
             ctx.save();
             let winningText = items[index];
 
-            if (winningText.toLowerCase().includes("trivial")) {
-                modalTitle.textContent = "🧠 ¡RETO TRIVIAL!";
-                resultText.textContent = "¡Pregunta para el chat!";
+            // Comprobación flexible para detectar el gajo Trivial
+            let isTrivial = winningText.toUpperCase().includes("TRIVIAL") || winningText.includes("🧠");
+
+            if (isTrivial) {
+                modalTitle.textContent = "🧠 ¡PREGUNTA TRIVIAL!";
+                resultText.textContent = "¡Responde en el chat!";
                 
-                // Seleccionar pregunta aleatoria
                 let randomQ = preguntasTrivial[Math.floor(Math.random() * preguntasTrivial.length)];
+                trivialCategory.textContent = randomQ.cat;
                 trivialQuestion.textContent = randomQ.q;
-                trivialAnswer.textContent = "Respuesta: " + randomQ.a;
+                trivialAnswer.textContent = "Correcta: " + randomQ.opts[randomQ.correct];
                 trivialAnswer.style.display = "none";
-                revealBtn.style.display = "inline-block";
+                revealBtn.style.display = "block";
+
+                // Generar botones de opciones A, B, C, D
+                optionsGrid.innerHTML = '';
+                const letters = ["A", "B", "C", "D"];
+                randomQ.opts.forEach((optText, optIdx) => {
+                    let btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = `${letters[optIdx]}) ${optText}`;
+                    btn.onclick = function() {
+                        let allBtns = optionsGrid.querySelectorAll('.option-btn');
+                        allBtns.forEach(b => b.disabled = true);
+                        if(optIdx === randomQ.correct) {
+                            btn.classList.add('correct');
+                        } else {
+                            btn.classList.add('wrong');
+                            allBtns[randomQ.correct].classList.add('correct');
+                        }
+                    };
+                    optionsGrid.appendChild(btn);
+                });
+
                 trivialBox.style.display = "block";
             } else {
                 modalTitle.textContent = "¡Resultado del Caos!";

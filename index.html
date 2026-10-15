@@ -90,7 +90,7 @@
         }
         .spin-btn:active { transform: scale(0.96); box-shadow: 0 0 10px var(--neon-pink); }
 
-        /* Panel de gestión / premios */
+        /* Panel de gestión */
         .panel {
             background-color: var(--panel-bg);
             border: 2px solid var(--neon-cyan);
@@ -180,7 +180,7 @@
         .modal-content h3 { color: var(--neon-yellow); font-size: 1.3rem; margin-bottom: 5px; text-transform: uppercase; }
         .modal-content p { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #fff; }
         
-        .trivial-box, .awkward-box, .joker-box {
+        .custom-box {
             background: rgba(0,0,0,0.5);
             border: 2px dashed var(--neon-cyan);
             padding: 15px;
@@ -189,7 +189,7 @@
             text-align: center;
         }
         .box-category {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--neon-pink);
             text-transform: uppercase;
             font-weight: bold;
@@ -286,31 +286,18 @@
         </div>
     </div>
 
-    <!-- Modal de Resultados -->
+    <!-- Modal Unificado de Resultados -->
     <div class="modal" id="resultModal">
         <div class="modal-content">
             <h3 id="modalTitle">¡Resultado del Caos!</h3>
             <p id="resultText">Premio</p>
 
-            <!-- Caja Trivial -->
-            <div class="trivial-box" id="trivialBox" style="display: none;">
-                <div class="box-category" id="trivialCategory">CATEGORÍA</div>
-                <div class="box-question" id="trivialQuestion">¿Pregunta?</div>
+            <div class="custom-box" id="customBox" style="display: none;">
+                <div class="box-category" id="boxCategory">CATEGORÍA</div>
+                <div class="box-question" id="boxQuestion">Detalle del reto</div>
                 <div class="options-grid" id="optionsGrid"></div>
-                <button class="btn-reveal" id="revealBtn">Ver Respuesta Correcta</button>
+                <button class="btn-reveal" id="revealBtn" style="display:none;">Ver Respuesta Correcta</button>
                 <div class="trivial-answer" id="trivialAnswer">Respuesta correcta</div>
-            </div>
-
-            <!-- Caja Pregunta Incómoda -->
-            <div class="awkward-box" id="awkwardBox" style="display: none;">
-                <div class="box-category">🔥 SALSEO / INCÓMODA</div>
-                <div class="box-question" id="awkwardQuestion">¿Pregunta incómoda?</div>
-            </div>
-
-            <!-- Caja Joker -->
-            <div class="joker-box" id="jokerBox" style="display: none;">
-                <div class="box-category" style="color: var(--neon-yellow);">🃏 COMODÍN DEL CAOS</div>
-                <div class="box-question" id="jokerQuestion" style="color: var(--neon-lime);">¡Poder especial!</div>
             </div>
 
             <button class="close-modal" id="closeModal">¡Entendido!</button>
@@ -319,45 +306,47 @@
 
     <script>
         const defaultItems = [
-            "🧠 TRIVIAL", "🃏 EL JOKER", "🤫 Pregunta incómoda", 
-            "Puntos dobles", "🧠 TRIVIAL", "🃏 EL JOKER", 
-            "🤫 Pregunta incómoda", "Gira de nuevo"
+            "🧠 TRIVIAL", "🔮 EL PÉNDULO", "🎁 REGALOS VIP", 
+            "🤫 INCÓMODA", "🃏 EL JOKER", "🧠 TRIVIAL", 
+            "🔮 EL PÉNDULO", "🎁 REGALOS VIP"
         ];
 
-        // Banco de preguntas de Trivial con opciones
         const preguntasTrivial = [
             { cat: "🎵 Música", q: "¿Quién canta la famosa canción 'Despacito'?", opts: ["Bad Bunny", "Luis Fonsi", "Daddy Yankee", "Rauw Alejandro"], correct: 1 },
             { cat: "🎵 Música", q: "¿De qué país es la cantante Rosalía?", opts: ["México", "Argentina", "España", "Colombia"], correct: 2 },
             { cat: "🎬 Cine & TV", q: "¿Cómo se llama el ogro verde de la película?", opts: ["Shrek", "Fiona", "Asno", "Lord Farquaad"], correct: 0 },
-            { cat: "🎬 Cine & TV", q: "¿En qué país se originó el género Anime?", opts: ["China", "Corea del Sur", "Japón", "Tailandia"], correct: 2 },
             { cat: "📱 Redes Social", q: "¿Qué red social tenía el icono de un pajarito azul?", opts: ["TikTok", "Instagram", "Twitter (X)", "Facebook"], correct: 2 },
             { cat: "🧠 Curiosidades", q: "¿Cuántos corazones tiene un pulpo?", opts: ["1 corazón", "2 corazones", "3 corazones", "4 corazones"], correct: 2 },
-            { cat: "🍕 Gastronomía", q: "¿Cuál es el ingrediente principal del guacamole?", opts: ["Tomate", "Aguacate", "Pimiento", "Cebolla"], correct: 1 },
-            { cat: "🌍 Cultura General", q: "¿En qué océano se hundió el Titanic?", opts: ["Océano Pacífico", "Océano Índico", "Océano Atlántico", "Océano Ártico"], correct: 2 }
+            { cat: "🍕 Gastronomía", q: "¿Cuál es el ingrediente principal del guacamole?", opts: ["Tomate", "Aguacate", "Pimiento", "Cebolla"], correct: 1 }
         ];
 
-        // Banco de Preguntas Incómodas
         const preguntasIncomodas = [
-            "¿Cuál ha sido tu mayor ridículo en público y en qué año fue?",
-            "Si pudieras borrar un mensaje de WhatsApp que mandaste por error, ¿a quién iba dirigido?",
-            "¿Qué es lo más extraño que has buscado en Google a altas horas de la noche?",
-            "¿Cuál es el peor corte de pelo o look que has llevado en tu vida?",
-            "¿Alguna vez te has quedado dormido/a en un lugar totalmente inadecuado? ¿Dónde?",
-            "¿Qué mentira piadosa dijiste la semana pasada para no quedar con alguien?",
-            "Si tu historial de YouTube o TikTok fuera público, ¿qué porcentaje de vergüenza tendrías?",
+            "¿Cuál ha sido tu mayor ridículo en público?",
+            "Si pudieras borrar un mensaje que mandaste por error, ¿a quién iba?",
+            "¿Qué mentira piadosa dijiste la semana pasada?",
             "¿Cuál es el capricho más absurdo en el que te has gastado dinero?",
-            "¿Qué manía secreta tienes cuando estás a solas en tu habitación?",
-            "Si tu ex tuviera que definirte con una sola palabra, ¿cuál crees que diría?"
+            "Si tu historial fuera público, ¿qué porcentaje de vergüenza tendrías?"
         ];
 
-        // Banco de Poderes del Joker
         const poderesJoker = [
-            "¡Poder Absoluto! Elige a alguien del chat para que cumpla el próximo castigo por ti.",
-            "¡Inmunidad Total! Te libras de cualquier castigo y ganas el doble de puntos.",
-            "¡Doble Giro! Vuelve a girar la ruleta inmediatamente y suma los dos premios.",
-            "¡El Chat Manda! Deja que los espectadores decidan tu próximo reto mediante votación rápida en comentarios.",
-            "¡Intercambio! Pásale el reto o la pregunta que te ha tocado a la última persona que envió un regalo.",
-            "¡Momento Saludo! Envía un saludo épico y personalizado a los últimos 3 seguidores que han entrado al directo."
+            "¡Poder Absoluto! Elige a alguien del chat para que cumpla el próximo castigo.",
+            "¡Doble Giro! Vuelve a girar la ruleta inmediatamente.",
+            "¡El Chat Manda! Los espectadores deciden tu próximo reto por comentarios.",
+            "¡Intercambio! Pásale el reto al último que envió un regalo."
+        ];
+
+        const respuestasPendulo = [
+            "🔮 El Péndulo dice: ¡DEFINITIVAMENTE SÍ!",
+            "🔮 El Péndulo dice: ¡NI DE COÑA (NO)!",
+            "🔮 El Péndulo dice: El destino no está claro... Pregunta de nuevo.",
+            "🔮 El Péndulo dice: Todo apunta a que SÍ con mucha suerte.",
+            "🔮 El Péndulo dice: Hay malas energías... La respuesta es NO."
+        ];
+
+        const dinámicasRegalos = [
+            "🎁 ¡RETO DE REGALOS! Si el chat envía 10 Rosas o 1 Regalo en 60s, ¡cumplo un reto extremo!",
+            "🎁 ¡COFRE DEL TESORO! La persona que envíe el próximo regalo elige qué reto tengo que hacer.",
+            "🎁 ¡SALUDOS VIP! Mando saludos especiales y sigo en directo a quien envíe el próximo regalo."
         ];
 
         let items = JSON.parse(localStorage.getItem('ruleta_caos_items')) || defaultItems;
@@ -372,19 +361,12 @@
         const resultText = document.getElementById('resultText');
         const modalTitle = document.getElementById('modalTitle');
         
-        const trivialBox = document.getElementById('trivialBox');
-        const trivialCategory = document.getElementById('trivialCategory');
-        const trivialQuestion = document.getElementById('trivialQuestion');
+        const customBox = document.getElementById('customBox');
+        const boxCategory = document.getElementById('boxCategory');
+        const boxQuestion = document.getElementById('boxQuestion');
         const optionsGrid = document.getElementById('optionsGrid');
         const trivialAnswer = document.getElementById('trivialAnswer');
         const revealBtn = document.getElementById('revealBtn');
-
-        const awkwardBox = document.getElementById('awkwardBox');
-        const awkwardQuestion = document.getElementById('awkwardQuestion');
-
-        const jokerBox = document.getElementById('jokerBox');
-        const jokerQuestion = document.getElementById('jokerQuestion');
-
         const closeModal = document.getElementById('closeModal');
 
         let startAngle = 0;
@@ -460,29 +442,22 @@
             let index = Math.floor((360 - degrees % 360) / arcd);
             ctx.save();
             let winningText = items[index];
-
             let textUpper = winningText.toUpperCase();
-            let isTrivial = textUpper.includes("TRIVIAL") || winningText.includes("🧠");
-            let isAwkward = textUpper.includes("INCÓMODA") || textUpper.includes("INCOMODA") || winningText.includes("🤫");
-            let isJoker = textUpper.includes("JOKER") || winningText.includes("🃏");
 
-            // Ocultar cajas por defecto
-            trivialBox.style.display = "none";
-            awkwardBox.style.display = "none";
-            jokerBox.style.display = "none";
+            customBox.style.display = "none";
+            optionsGrid.innerHTML = '';
+            revealBtn.style.display = "none";
+            trivialAnswer.style.display = "none";
 
-            if (isTrivial) {
+            if (textUpper.includes("TRIVIAL") || winningText.includes("🧠")) {
                 modalTitle.textContent = "🧠 ¡PREGUNTA TRIVIAL!";
                 resultText.textContent = "¡Responde en el chat!";
-                
                 let randomQ = preguntasTrivial[Math.floor(Math.random() * preguntasTrivial.length)];
-                trivialCategory.textContent = randomQ.cat;
-                trivialQuestion.textContent = randomQ.q;
+                boxCategory.textContent = randomQ.cat;
+                boxQuestion.textContent = randomQ.q;
                 trivialAnswer.textContent = "Correcta: " + randomQ.opts[randomQ.correct];
-                trivialAnswer.style.display = "none";
                 revealBtn.style.display = "block";
 
-                optionsGrid.innerHTML = '';
                 const letters = ["A", "B", "C", "D"];
                 randomQ.opts.forEach((optText, optIdx) => {
                     let btn = document.createElement('button');
@@ -500,24 +475,35 @@
                     };
                     optionsGrid.appendChild(btn);
                 });
+                customBox.style.display = "block";
 
-                trivialBox.style.display = "block";
-
-            } else if (isAwkward) {
+            } else if (textUpper.includes("INCÓMODA") || textUpper.includes("INCOMODA") || winningText.includes("🤫")) {
                 modalTitle.textContent = "🤫 ¡ZONA DE SALSEO!";
                 resultText.textContent = "¡Confesión obligatoria!";
-                
-                let randomAwkward = preguntasIncomodas[Math.floor(Math.random() * preguntasIncomodas.length)];
-                awkwardQuestion.textContent = randomAwkward;
-                awkwardBox.style.display = "block";
+                boxCategory.textContent = "🔥 PREGUNTA INCÓMODA";
+                boxQuestion.textContent = preguntasIncomodas[Math.floor(Math.random() * preguntasIncomodas.length)];
+                customBox.style.display = "block";
 
-            } else if (isJoker) {
+            } else if (textUpper.includes("JOKER") || winningText.includes("🃏")) {
                 modalTitle.textContent = "🃏 ¡HA SALIDO EL JOKER!";
                 resultText.textContent = "¡Poder oculto activado!";
-                
-                let randomJoker = poderesJoker[Math.floor(Math.random() * poderesJoker.length)];
-                jokerQuestion.textContent = randomJoker;
-                jokerBox.style.display = "block";
+                boxCategory.textContent = "⚡ PODER COMODÍN";
+                boxQuestion.textContent = poderesJoker[Math.floor(Math.random() * poderesJoker.length)];
+                customBox.style.display = "block";
+
+            } else if (textUpper.includes("PÉNDULO") || textUpper.includes("PENDULO") || winningText.includes("🔮")) {
+                modalTitle.textContent = "🔮 ¡PREGÚNTALE AL PÉNDULO!";
+                resultText.textContent = "¡Haz tu pregunta en el chat!";
+                boxCategory.textContent = "✨ PREDICCIÓN MÍSTICA";
+                boxQuestion.textContent = respuestasPendulo[Math.floor(Math.random() * respuestasPendulo.length)];
+                customBox.style.display = "block";
+
+            } else if (textUpper.includes("REGALOS") || winningText.includes("🎁")) {
+                modalTitle.textContent = "🎁 ¡EVENTO DE REGALOS VIP!";
+                resultText.textContent = "¡Momento especial para el chat!";
+                boxCategory.textContent = "👑 DINÁMICA DE REGALOS";
+                boxQuestion.textContent = dinámicasRegalos[Math.floor(Math.random() * dinámicasRegalos.length)];
+                customBox.style.display = "block";
 
             } else {
                 modalTitle.textContent = "¡Resultado del Caos!";

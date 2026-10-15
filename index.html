@@ -180,28 +180,26 @@
         .modal-content h3 { color: var(--neon-yellow); font-size: 1.3rem; margin-bottom: 5px; text-transform: uppercase; }
         .modal-content p { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #fff; }
         
-        .trivial-box {
+        .trivial-box, .awkward-box {
             background: rgba(0,0,0,0.5);
             border: 2px dashed var(--neon-cyan);
-            padding: 12px;
+            padding: 15px;
             border-radius: 12px;
             margin-bottom: 15px;
-            text-align: left;
+            text-align: center;
         }
-        .trivial-category {
+        .box-category {
             font-size: 0.8rem;
             color: var(--neon-pink);
             text-transform: uppercase;
             font-weight: bold;
-            margin-bottom: 4px;
-            text-align: center;
+            margin-bottom: 6px;
         }
-        .trivial-question { 
+        .box-question { 
             color: var(--neon-cyan); 
-            font-size: 1rem; 
-            margin-bottom: 12px; 
-            line-height: 1.3; 
-            text-align: center;
+            font-size: 1.1rem; 
+            margin-bottom: 10px; 
+            line-height: 1.4; 
             font-weight: bold;
         }
 
@@ -231,19 +229,18 @@
             font-weight: bold; 
             display: none; 
             margin-top: 8px; 
-            text-align: center;
         }
         
         .btn-reveal {
             background: var(--neon-yellow);
             color: #000;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 16px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
 
         .close-modal {
@@ -289,18 +286,25 @@
         </div>
     </div>
 
-    <!-- Modal de Resultado Normal / Trivial -->
+    <!-- Modal de Resultados -->
     <div class="modal" id="resultModal">
         <div class="modal-content">
             <h3 id="modalTitle">¡Resultado del Caos!</h3>
             <p id="resultText">Premio</p>
 
+            <!-- Caja Trivial -->
             <div class="trivial-box" id="trivialBox" style="display: none;">
-                <div class="trivial-category" id="trivialCategory">CATEGORÍA</div>
-                <div class="trivial-question" id="trivialQuestion">¿Pregunta?</div>
+                <div class="box-category" id="trivialCategory">CATEGORÍA</div>
+                <div class="box-question" id="trivialQuestion">¿Pregunta?</div>
                 <div class="options-grid" id="optionsGrid"></div>
                 <button class="btn-reveal" id="revealBtn">Ver Respuesta Correcta</button>
                 <div class="trivial-answer" id="trivialAnswer">Respuesta correcta</div>
+            </div>
+
+            <!-- Caja Pregunta Incómoda -->
+            <div class="awkward-box" id="awkwardBox" style="display: none;">
+                <div class="box-category">🔥 SALSEO / INCÓMODA</div>
+                <div class="box-question" id="awkwardQuestion">¿Pregunta incómoda?</div>
             </div>
 
             <button class="close-modal" id="closeModal">¡Entendido!</button>
@@ -309,36 +313,35 @@
 
     <script>
         const defaultItems = [
-            "🧠 TRIVIAL", "Dueto improvisado", "Imita a un famoso", 
+            "🧠 TRIVIAL", "Dueto improvisado", "🤫 Pregunta incómoda", 
             "Puntos dobles", "🧠 TRIVIAL", "Baila la macarena", 
-            "Pregunta incómoda", "Gira de nuevo"
+            "🤫 Pregunta incómoda", "Gira de nuevo"
         ];
 
-        // Banco de preguntas de Trivial con 4 OPCIONES de respuesta
+        // Banco de preguntas de Trivial con opciones
         const preguntasTrivial = [
-            // Música
             { cat: "🎵 Música", q: "¿Quién canta la famosa canción 'Despacito'?", opts: ["Bad Bunny", "Luis Fonsi", "Daddy Yankee", "Rauw Alejandro"], correct: 1 },
-            { cat: "🎵 Música", q: "¿De qué provincia andaluza es la cantante Rosalía?", opts: ["Barcelona (No es andaluza)", "Sevilla", "Málaga", "Cádiz"], correct: 0 },
-            { cat: "🎵 Música", q: "¿Qué instrumento toca Paco de Lucía?", opts: ["Piano", "Violín", "Guitarra flamenca", "Saxofón"], correct: 2 },
-            { cat: "🎵 Música", q: "¿A qué famoso cantante apodaban 'El Rey del Pop'?", opts: ["Prince", "Michael Jackson", "Elvis Presley", "Freddie Mercury"], correct: 1 },
-
-            // Cine y Televisión
+            { cat: "🎵 Música", q: "¿De qué país es la cantante Rosalía?", opts: ["México", "Argentina", "España", "Colombia"], correct: 2 },
             { cat: "🎬 Cine & TV", q: "¿Cómo se llama el ogro verde de la película?", opts: ["Shrek", "Fiona", "Asno", "Lord Farquaad"], correct: 0 },
             { cat: "🎬 Cine & TV", q: "¿En qué país se originó el género Anime?", opts: ["China", "Corea del Sur", "Japón", "Tailandia"], correct: 2 },
-            { cat: "🎬 Cine & TV", q: "¿De qué color es el muñeco de nieve Olaf de Frozen?", opts: ["Azul", "Blanco", "Amarillo", "Transparente"], correct: 1 },
-            { cat: "🎬 Cine & TV", q: "¿Cómo se llama la identidad secreta de Spider-Man?", opts: ["Bruce Wayne", "Peter Parker", "Tony Stark", "Clark Kent"], correct: 1 },
-
-            // Redes y Curiosidades
             { cat: "📱 Redes Social", q: "¿Qué red social tenía el icono de un pajarito azul?", opts: ["TikTok", "Instagram", "Twitter (X)", "Facebook"], correct: 2 },
-            { cat: "🧠 Curiosidades", q: "¿Cuál es el único mamífero capaz de volar?", opts: ["El murciélago", "El ardilla voladora", "El colibrí", "El pingüino"], correct: 0 },
             { cat: "🧠 Curiosidades", q: "¿Cuántos corazones tiene un pulpo?", opts: ["1 corazón", "2 corazones", "3 corazones", "4 corazones"], correct: 2 },
-            { cat: "🧠 Curiosidades", q: "¿De qué color es la piel del oso polar debajo del pelo?", opts: ["Rosa", "Blanca", "Negra", "Gris"], correct: 2 },
-
-            // Cultura General y Comida
             { cat: "🍕 Gastronomía", q: "¿Cuál es el ingrediente principal del guacamole?", opts: ["Tomate", "Aguacate", "Pimiento", "Cebolla"], correct: 1 },
-            { cat: "🌍 Cultura General", q: "¿En qué océano se hundió el Titanic?", opts: ["Océano Pacífico", "Océano Índico", "Océano Atlántico", "Océano Ártico"], correct: 2 },
-            { cat: "🌍 Cultura General", q: "¿Cuántos días tiene un año bisiesto?", opts: ["365 días", "366 días", "364 días", "367 días"], correct: 1 },
-            { cat: "🌍 Cultura General", q: "¿Cuál es la capital de Italia?", opts: ["Milán", "Venecia", "Nápoles", "Roma"], correct: 3 }
+            { cat: "🌍 Cultura General", q: "¿En qué océano se hundió el Titanic?", opts: ["Océano Pacífico", "Océano Índico", "Océano Atlántico", "Océano Ártico"], correct: 2 }
+        ];
+
+        // Banco de Preguntas Incómodas para el directo
+        const preguntasIncomodas = [
+            "¿Cuál ha sido tu mayor ridículo en público y en qué año fue?",
+            "Si pudieras borrar un mensaje de WhatsApp que mandaste por error, ¿a quién iba dirigido?",
+            "¿Qué es lo más extraño que has buscado en Google a altas horas de la noche?",
+            "¿Cuál es el peor corte de pelo o look que has llevado en tu vida?",
+            "¿Alguna vez te has quedado dormido/a en un lugar totalmente inadecuado? ¿Dónde?",
+            "¿Qué mentira piadosa dijiste la semana pasada para no quedar con alguien?",
+            "Si tu historial de YouTube o TikTok fuera público, ¿qué porcentaje de vergüenza tendrías?",
+            "¿Cuál es el capricho más absurdo en el que te has gastado dinero?",
+            "¿Qué manía secreta tienes cuando estás a solas en tu habitación?",
+            "Si tu ex tuviera que definirte con una sola palabra, ¿cuál crees que diría?"
         ];
 
         let items = JSON.parse(localStorage.getItem('ruleta_caos_items')) || defaultItems;
@@ -352,12 +355,16 @@
         const resultModal = document.getElementById('resultModal');
         const resultText = document.getElementById('resultText');
         const modalTitle = document.getElementById('modalTitle');
+        
         const trivialBox = document.getElementById('trivialBox');
         const trivialCategory = document.getElementById('trivialCategory');
         const trivialQuestion = document.getElementById('trivialQuestion');
         const optionsGrid = document.getElementById('optionsGrid');
         const trivialAnswer = document.getElementById('trivialAnswer');
         const revealBtn = document.getElementById('revealBtn');
+
+        const awkwardBox = document.getElementById('awkwardBox');
+        const awkwardQuestion = document.getElementById('awkwardQuestion');
         const closeModal = document.getElementById('closeModal');
 
         let startAngle = 0;
@@ -434,8 +441,13 @@
             ctx.save();
             let winningText = items[index];
 
-            // Comprobación flexible para detectar el gajo Trivial
-            let isTrivial = winningText.toUpperCase().includes("TRIVIAL") || winningText.includes("🧠");
+            let textUpper = winningText.toUpperCase();
+            let isTrivial = textUpper.includes("TRIVIAL") || winningText.includes("🧠");
+            let isAwkward = textUpper.includes("INCÓMODA") || textUpper.includes("INCOMODA") || winningText.includes("🤫");
+
+            // Ocultar cajas por defecto
+            trivialBox.style.display = "none";
+            awkwardBox.style.display = "none";
 
             if (isTrivial) {
                 modalTitle.textContent = "🧠 ¡PREGUNTA TRIVIAL!";
@@ -448,7 +460,6 @@
                 trivialAnswer.style.display = "none";
                 revealBtn.style.display = "block";
 
-                // Generar botones de opciones A, B, C, D
                 optionsGrid.innerHTML = '';
                 const letters = ["A", "B", "C", "D"];
                 randomQ.opts.forEach((optText, optIdx) => {
@@ -469,10 +480,18 @@
                 });
 
                 trivialBox.style.display = "block";
+
+            } else if (isAwkward) {
+                modalTitle.textContent = "🤫 ¡ZONA DE SALSEO!";
+                resultText.textContent = "¡Confesión obligatoria!";
+                
+                let randomAwkward = preguntasIncomodas[Math.floor(Math.random() * preguntasIncomodas.length)];
+                awkwardQuestion.textContent = randomAwkward;
+                awkwardBox.style.display = "block";
+
             } else {
                 modalTitle.textContent = "¡Resultado del Caos!";
                 resultText.textContent = winningText;
-                trivialBox.style.display = "none";
             }
 
             resultModal.classList.add('show');

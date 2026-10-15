@@ -151,11 +151,11 @@
         
         /* Listas */
         .items-list, .players-list {
-            max-height: 120px;
+            max-height: 140px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
             padding-right: 4px;
         }
         .item-row, .player-row {
@@ -171,21 +171,34 @@
         .player-info {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            overflow: hidden;
         }
-        .player-name { font-weight: bold; color: #fff; }
+        .player-name { font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
         .player-score { 
             background: var(--neon-pink); 
             color: white; 
             padding: 2px 6px; 
             border-radius: 10px; 
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
 
         .player-controls {
             display: flex;
-            gap: 4px;
+            gap: 3px;
+            align-items: center;
+        }
+        .select-turn-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-weight: bold;
         }
         .score-btn {
             background: #374151;
@@ -195,7 +208,7 @@
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         .score-btn.plus { background: #166534; border-color: var(--neon-lime); color: var(--neon-lime); }
         .score-btn.minus { background: #991b1b; border-color: #ef4444; color: #fca5a5; }
@@ -207,23 +220,37 @@
             padding: 3px 6px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
-        /* Banner de Turno Actual */
-        .turn-banner {
+        /* Banner de Turno Actual y Botón Siguiente */
+        .turn-box {
             background: linear-gradient(135deg, #7c3aed, #db2777);
             border: 2px solid var(--neon-yellow);
             padding: 10px;
             border-radius: 12px;
             text-align: center;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #fff;
-            box-shadow: 0 0 15px rgba(255, 254, 0, 0.4);
+            box-shadow: 0 0 15px rgba(255, 254, 0, 0.3);
             margin-bottom: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
-        .turn-banner span { color: var(--neon-yellow); text-transform: uppercase; }
+        .turn-text { font-size: 0.95rem; font-weight: bold; color: #fff; }
+        .turn-text span { color: var(--neon-yellow); text-transform: uppercase; }
+        
+        .next-turn-btn {
+            background: var(--neon-yellow);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 8px rgba(255, 254, 0, 0.5);
+        }
 
         /* Modales */
         .modal {
@@ -355,11 +382,12 @@
             <button class="spin-btn" id="spinButton">¡Girar Ruleta!</button>
         </div>
 
-        <!-- Columna Derecha: Tablero de Puntos y Gestor de Casillas -->
+        <!-- Columna Derecha: Tablero de Puntos, Control de Turnos y Gestor de Casillas -->
         <div class="column-side">
-            <!-- Banner de Turno -->
-            <div class="turn-banner" id="turnBanner">
-                🎮 Turno de: <span id="currentTurnPlayer">Nadie (Añade jugadores)</span>
+            <!-- Caja de Turno Manual -->
+            <div class="turn-box">
+                <div class="turn-text">🎮 Turno de: <span id="currentTurnPlayer">Nadie</span></div>
+                <button class="next-turn-btn" id="nextTurnBtn">➡️ Siguiente Turno</button>
             </div>
 
             <!-- Panel Marcador de Jugadores -->
@@ -453,6 +481,7 @@
 
         let items = JSON.parse(localStorage.getItem('ruleta_caos_items')) || defaultItems;
         let players = JSON.parse(localStorage.getItem('ruleta_caos_players')) || defaultPlayers;
+        let currentTurnIndex = 0; // Índice del jugador actual en la lista
 
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
@@ -465,6 +494,7 @@
         const newPlayerName = document.getElementById('newPlayerName');
         const addPlayerBtn = document.getElementById('addPlayerBtn');
         const currentTurnPlayer = document.getElementById('currentTurnPlayer');
+        const nextTurnBtn = document.getElementById('nextTurnBtn');
 
         const resultModal = document.getElementById('resultModal');
         const resultText = document.getElementById('resultText');
@@ -545,6 +575,12 @@
             spinTimeout = setTimeout(rotateWheel, 30);
         }
 
+        function getActivePlayerName() {
+            if (players.length === 0) return "Nadie";
+            if (currentTurnIndex >= players.length) currentTurnIndex = 0;
+            return players[currentTurnIndex].name;
+        }
+
         function stopRotateWheel() {
             let degrees = startAngle * 180 / Math.PI + 90;
             let arcd = arc * 180 / Math.PI;
@@ -553,13 +589,7 @@
             let winningText = items[index];
             let textUpper = winningText.toUpperCase();
 
-            // Seleccionar aleatoriamente a un jugador del marcador para el turno
-            if (players.length > 0) {
-                let randomPlayer = players[Math.floor(Math.random() * players.length)];
-                currentTurnPlayer.textContent = randomPlayer.name;
-            } else {
-                currentTurnPlayer.textContent = "Nadie (Añade jugadores)";
-            }
+            let activeName = getActivePlayerName();
 
             customBox.style.display = "none";
             optionsGrid.innerHTML = '';
@@ -568,7 +598,7 @@
 
             if (textUpper.includes("TRIVIAL") || winningText.includes("🧠")) {
                 modalTitle.textContent = "🧠 ¡PREGUNTA TRIVIAL!";
-                resultText.textContent = `Turno de: ${currentTurnPlayer.textContent}`;
+                resultText.textContent = `Turno de: ${activeName}`;
                 let randomQ = preguntasTrivial[Math.floor(Math.random() * preguntasTrivial.length)];
                 boxCategory.textContent = randomQ.cat;
                 boxQuestion.textContent = randomQ.q;
@@ -597,11 +627,10 @@
 
             } else if (textUpper.includes("PÉNDULO") || textUpper.includes("PENDULO") || winningText.includes("🔮")) {
                 modalTitle.textContent = "🔮 ¡PREGÚNTALE AL PÉNDULO!";
-                resultText.textContent = `Turno de: ${currentTurnPlayer.textContent}`;
+                resultText.textContent = `Turno de: ${activeName}`;
                 boxCategory.textContent = "✨ RITUAL MÍSTICO";
-                boxQuestion.textContent = `¡${currentTurnPlayer.textContent}, formula en voz alta tu pregunta de SÍ o NO al Péndulo!`;
+                boxQuestion.textContent = `¡${activeName}, formula en voz alta tu pregunta de SÍ o NO al Péndulo!`;
                 
-                // Preparar la respuesta oculta para cuando se pulse el botón
                 let randomAnswer = respuestasPendulo[Math.floor(Math.random() * respuestasPendulo.length)];
                 trivialAnswer.textContent = randomAnswer;
                 revealBtn.textContent = "🔮 Consultar al Péndulo";
@@ -611,42 +640,42 @@
 
             } else if (textUpper.includes("GANAS") || textUpper.includes("SUMA")) {
                 modalTitle.textContent = "🎉 ¡PUNTO EXTRA!";
-                resultText.textContent = `¡${currentTurnPlayer.textContent} gana 1 punto!`;
+                resultText.textContent = `¡${activeName} gana 1 punto!`;
                 boxCategory.textContent = "⭐ RECOMPENSA";
                 boxQuestion.textContent = "¡Súmale +1 punto en el tablero lateral!";
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("PIERDES") || textUpper.includes("RESTA")) {
                 modalTitle.textContent = "💥 ¡PENALIZACIÓN!";
-                resultText.textContent = `¡${currentTurnPlayer.textContent} pierde 1 punto!`;
+                resultText.textContent = `¡${activeName} pierde 1 punto!`;
                 boxCategory.textContent = "⚠️ RESTA DE PUNTOS";
                 boxQuestion.textContent = "¡Réstale -1 punto en el tablero lateral!";
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("INCÓMODA") || textUpper.includes("INCOMODA") || winningText.includes("🤫")) {
                 modalTitle.textContent = "🤫 ¡ZONA DE SALSEO!";
-                resultText.textContent = `Le toca confesar a: ${currentTurnPlayer.textContent}`;
+                resultText.textContent = `Le toca confesar a: ${activeName}`;
                 boxCategory.textContent = "🔥 PREGUNTA INCÓMODA";
                 boxQuestion.textContent = preguntasIncomodas[Math.floor(Math.random() * preguntasIncomodas.length)];
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("JOKER") || winningText.includes("🃏")) {
                 modalTitle.textContent = "🃏 ¡PODER DEL JOKER!";
-                resultText.textContent = `Poder especial para: ${currentTurnPlayer.textContent}`;
+                resultText.textContent = `Poder especial para: ${activeName}`;
                 boxCategory.textContent = "⚡ COMODÍN";
                 boxQuestion.textContent = poderesJoker[Math.floor(Math.random() * poderesJoker.length)];
                 customBox.style.display = "block";
 
             } else if (textUpper.includes("REGALOS") || winningText.includes("🎁")) {
                 modalTitle.textContent = "🎁 ¡EVENTO DE REGALOS VIP!";
-                resultText.textContent = `¡Reto para ${currentTurnPlayer.textContent} y el chat!`;
+                resultText.textContent = `¡Reto para ${activeName} y el chat!`;
                 boxCategory.textContent = "👑 DINÁMICA DE REGALOS";
                 boxQuestion.textContent = dinámicasRegalos[Math.floor(Math.random() * dinámicasRegalos.length)];
                 customBox.style.display = "block";
 
             } else {
                 modalTitle.textContent = "¡Resultado del Caos!";
-                resultText.textContent = `${currentTurnPlayer.textContent}: ${winningText}`;
+                resultText.textContent = `${activeName}: ${winningText}`;
             }
 
             resultModal.classList.add('show');
@@ -704,24 +733,30 @@
             }
         });
 
-        // --- Gestión de Jugadores ---
+        // --- Gestión de Jugadores y Turnos Manuales ---
         function updatePlayersList() {
             playersList.innerHTML = '';
             if (players.length === 0) {
                 playersList.innerHTML = '<div style="text-align:center; color:#9ca3af; font-size:0.8rem;">No hay jugadores. ¡Añade el primero!</div>';
-                currentTurnPlayer.textContent = "Nadie (Añade jugadores)";
+                currentTurnPlayer.textContent = "Nadie";
             } else {
-                currentTurnPlayer.textContent = players[0].name;
+                if (currentTurnIndex >= players.length) currentTurnIndex = 0;
+                currentTurnPlayer.textContent = players[currentTurnIndex].name;
             }
+
             players.forEach((player, index) => {
                 let row = document.createElement('div');
                 row.className = 'player-row';
+                let isCurrent = (index === currentTurnIndex);
+                row.style.border = isCurrent ? "1px solid var(--neon-yellow)" : "none";
+
                 row.innerHTML = `
                     <div class="player-info">
                         <span class="player-name">${player.name}</span>
                         <span class="player-score">${player.score} pts</span>
                     </div>
                     <div class="player-controls">
+                        <button class="select-turn-btn" onclick="setTurn(${index})" title="Pasar turno a este jugador">🎯</button>
                         <button class="score-btn plus" onclick="changeScore(${index}, 1)">+1</button>
                         <button class="score-btn minus" onclick="changeScore(${index}, -1)">-1</button>
                         <button class="delete-btn" onclick="removePlayer(${index})">🗑️</button>
@@ -732,6 +767,18 @@
             localStorage.setItem('ruleta_caos_players', JSON.stringify(players));
         }
 
+        window.setTurn = function(index) {
+            currentTurnIndex = index;
+            updatePlayersList();
+        };
+
+        nextTurnBtn.addEventListener('click', () => {
+            if (players.length > 0) {
+                currentTurnIndex = (currentTurnIndex + 1) % players.length;
+                updatePlayersList();
+            }
+        });
+
         window.changeScore = function(index, delta) {
             players[index].score += delta;
             updatePlayersList();
@@ -739,6 +786,7 @@
 
         window.removePlayer = function(index) {
             players.splice(index, 1);
+            if (currentTurnIndex >= players.length) currentTurnIndex = Math.max(0, players.length - 1);
             updatePlayersList();
         };
 
